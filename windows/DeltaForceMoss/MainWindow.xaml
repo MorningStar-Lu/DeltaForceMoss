@@ -30,10 +30,10 @@
                     <TextBlock Text="◆ 摩斯破译 · 极简浮窗" Foreground="#00F0FF" FontFamily="Consolas" FontSize="11" FontWeight="Bold"/>
                 </StackPanel>
 
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Gap="6">
-                    <Button Name="PinBtn" Content="📌" Click="PinBtn_Click" ToolTip="固定置顶" Width="24" Height="20" Background="Transparent" Foreground="#00F0FF" BorderThickness="0" Cursor="Hand"/>
-                    <Button Name="MinBtn" Content="—" Click="MinBtn_Click" ToolTip="最小化" Width="24" Height="20" Background="Transparent" Foreground="#8A9BAE" BorderThickness="0" Cursor="Hand"/>
-                    <Button Name="CloseBtn" Content="✕" Click="CloseBtn_Click" ToolTip="关闭" Width="24" Height="20" Background="Transparent" Foreground="#FF0055" BorderThickness="0" Cursor="Hand"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Name="PinBtn" Content="📌" Click="PinBtn_Click" ToolTip="固定置顶" Width="24" Height="20" Background="Transparent" Foreground="#00F0FF" BorderThickness="0" Cursor="Hand" Margin="2,0"/>
+                    <Button Name="MinBtn" Content="—" Click="MinBtn_Click" ToolTip="最小化" Width="24" Height="20" Background="Transparent" Foreground="#8A9BAE" BorderThickness="0" Cursor="Hand" Margin="2,0"/>
+                    <Button Name="CloseBtn" Content="✕" Click="CloseBtn_Click" ToolTip="关闭" Width="24" Height="20" Background="Transparent" Foreground="#FF0055" BorderThickness="0" Cursor="Hand" Margin="2,0"/>
                 </StackPanel>
             </Grid>
 
@@ -71,10 +71,10 @@
 
                 <TextBlock Name="StatusText" Text="● WASAPI 全局音频监听中" Foreground="#25F48B" FontSize="10" VerticalAlignment="Center" FontFamily="Consolas"/>
 
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Gap="4">
-                    <Button Content="·" Click="DotBtn_Click" ToolTip="手动短音" Width="22" Height="18" Background="#1100F0FF" Foreground="#00F0FF" BorderBrush="#00F0FF" BorderThickness="1" FontSize="10" Cursor="Hand"/>
-                    <Button Content="—" Click="DashBtn_Click" ToolTip="手动长音" Width="22" Height="18" Background="#1100F0FF" Foreground="#00F0FF" BorderBrush="#00F0FF" BorderThickness="1" FontSize="10" Cursor="Hand"/>
-                    <Button Content="⌁" Click="ClearBtn_Click" ToolTip="清空本轮" Width="22" Height="18" Background="#22FF0055" Foreground="#FF0055" BorderBrush="#FF0055" BorderThickness="1" FontSize="10" Cursor="Hand"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="·" Click="DotBtn_Click" ToolTip="手动短音" Width="22" Height="18" Background="#1100F0FF" Foreground="#00F0FF" BorderBrush="#00F0FF" BorderThickness="1" FontSize="10" Cursor="Hand" Margin="2,0"/>
+                    <Button Content="—" Click="DashBtn_Click" ToolTip="手动长音" Width="22" Height="18" Background="#1100F0FF" Foreground="#00F0FF" BorderBrush="#00F0FF" BorderThickness="1" FontSize="10" Cursor="Hand" Margin="2,0"/>
+                    <Button Content="⌁" Click="ClearBtn_Click" ToolTip="清空本轮" Width="22" Height="18" Background="#22FF0055" Foreground="#FF0055" BorderBrush="#FF0055" BorderThickness="1" FontSize="10" Cursor="Hand" Margin="2,0"/>
                 </StackPanel>
             </Grid>
         </Grid>
