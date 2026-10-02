@@ -28,7 +28,7 @@ jobs:
 
       - name: Publish Single-File EXE
         shell: cmd
-        run: dotnet publish windows/DeltaForceMoss/DeltaForceMoss.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o build_out
+        run: dotnet publish windows/DeltaForceMoss/DeltaForceMoss.csproj -c Release -o build_out
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
