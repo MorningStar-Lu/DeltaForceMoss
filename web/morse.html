@@ -94,7 +94,12 @@
 
       <div class="status-row"><span class="lamp" id="lamp"></span><span id="status">待机 · 点击电源开始</span><span id="signalLevel">信号 —</span></div>
       <p class="rolling-status" id="rollingStatus" aria-live="polite">滚动复核：待机</p>
-      <div class="search-row"><button id="searchBtn" type="button" disabled>↻ 重新搜索</button><span>开始监听后自动寻找完整的提示音组，无需手动校准。</span></div>
+      <div class="search-row">
+        <button id="searchBtn" type="button" disabled>↻ 重新搜索</button>
+        <label class="auto-reset-label" title="开启后，完成三位解码 10 秒后会自动重置屏幕准备下一轮破译">
+          <input type="checkbox" id="autoResetCheck" checked /> 破译成功 10 秒后自动重置准备下一轮
+        </label>
+      </div>
       <div class="search-row" id="diagnosticRow" hidden><button id="diagnosticBtn" type="button" disabled>● 开始诊断录制</button><span id="diagnosticNote">仅在点击后录制当前输入的音频及识别日志；停止时下载到本机，不会上传。可能录到语音，分享前请检查。最长 2 分钟。</span></div>
       <div class="hint-box"><span>提示</span><p id="hint">连续五段同频提示音构成有效数字时才显示结果，也可用下方按钮手动校对。</p></div>
 

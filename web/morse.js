@@ -153,10 +153,48 @@ function render() {
   }
 }
 
+let autoResetTimer = null;
+let autoResetCountdown = 0;
+
+function clearAutoResetTimer() {
+  if (autoResetTimer) {
+    clearInterval(autoResetTimer);
+    autoResetTimer = null;
+  }
+  autoResetCountdown = 0;
+}
+
+function startAutoResetTimer() {
+  clearAutoResetTimer();
+  const check = $('#autoResetCheck');
+  if (check && !check.checked) return;
+
+  autoResetCountdown = 10;
+  $('#rollingStatus').textContent = `破译成功 · 10 秒后自动重置准备下一轮`;
+
+  autoResetTimer = setInterval(() => {
+    autoResetCountdown--;
+    if (autoResetCountdown > 0) {
+      $('#rollingStatus').textContent = `破译成功 · ${autoResetCountdown} 秒后自动重置准备下一轮`;
+      if ($('#compactCandidate')) $('#compactCandidate').textContent = `破译成功 · ${autoResetCountdown}s 后重置准备下一轮`;
+      if (pipWindow && pipWindow.document) {
+        const pipCandidate = pipWindow.document.getElementById('pipCandidate');
+        if (pipCandidate) pipCandidate.textContent = `破译成功 · ${autoResetCountdown}s 后重置准备下一轮`;
+      }
+    } else {
+      clearAutoResetTimer();
+      clearRound();
+      status('已自动重置 · 准备捕获下一个密码门', true);
+      hint('自动重置已完成，随时开始下一轮密码提示音捕获。');
+    }
+  }, 1000);
+}
+
 function commitDigit(digit, rawSymbols = symbols) {
   if (digits.length === 3) {
     digits = '';
     morseGroups = [];
+    clearAutoResetTimer();
   }
   digits += digit;
   if (rawSymbols) morseGroups.push(rawSymbols);
@@ -171,7 +209,8 @@ function commitDigit(digit, rawSymbols = symbols) {
         history = history.slice(0, 12);
       }
       status(`已识别三位密码：${digits}`, !!analyser);
-      hint('请在游戏内核对结果；如有误，可展开手动输入校对。');
+      hint('请在游戏内核对结果；将在 10 秒后自动重置准备下一轮。');
+      startAutoResetTimer();
     }
   }
   render();
@@ -181,6 +220,7 @@ function commitUnknown(rawSymbols) {
   if (digits.length === 3) {
     digits = '';
     morseGroups = [];
+    clearAutoResetTimer();
   }
   digits += '?';
   morseGroups.push(rawSymbols || '?');
@@ -199,7 +239,8 @@ function commitRollingCode(code, frequency) {
   }
   $('#rollingStatus').textContent = `滚动复核：两次播放一致 · ${code} · 约 ${frequency} Hz`;
   status(`滚动复核得到三位密码：${code}`, true);
-  hint('两次完整播放的节奏一致；仍请以游戏内反馈核对。');
+  hint('两次完整播放的节奏一致；10 秒后自动重置准备下一轮。');
+  startAutoResetTimer();
   render();
 }
 
@@ -592,7 +633,7 @@ async function togglePipWindow() {
   try {
     pipWindow = await window.documentPictureInPicture.requestWindow({
       width: 330,
-      height: 180,
+      height: 220,
     });
 
     [...document.styleSheets].forEach(sheet => {
@@ -629,9 +670,31 @@ async function togglePipWindow() {
             <span class="compact-label">候选斜杠 / 点划</span>
             <div id="pipCandidate" class="compact-candidate" style="font-size:12px; padding:4px 8px;">${[...morseGroups, ...(symbols ? [symbols] : [])].join(' / ') || '/ / / (等待信号)'}</div>
           </div>
+          <div class="pip-actions" style="display:flex; gap:6px; margin-top:8px;">
+            <button id="pipResetBtn" class="compact-btn" style="flex:1; padding:4px; font-size:11px;" type="button">⌁ 清空重置</button>
+            <button id="pipSearchBtn" class="compact-btn" style="flex:1; padding:4px; font-size:11px;" type="button">↻ 重新搜索</button>
+          </div>
         </div>
       </div>
     `;
+
+    pipWindow.document.getElementById('pipResetBtn')?.addEventListener('click', () => {
+      clearAutoResetTimer();
+      clearRound();
+    });
+
+    pipWindow.document.getElementById('pipSearchBtn')?.addEventListener('click', () => {
+      clearAutoResetTimer();
+      detector.reset();
+      gameCue.reset();
+      rolling.reset();
+      digits = '';
+      symbols = '';
+      morseGroups = [];
+      $('#frequency').textContent = '自动搜索中';
+      status('已重新搜索提示音', true);
+      render();
+    });
 
     pipWindow.addEventListener('pagehide', () => {
       pipWindow = null;

@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace DeltaForceMoss.Services
 {
     /// <summary>
-    /// 摩斯密码门音频识别引擎 (C# 原生版)
+    /// 摩斯密码门音频识别引擎 (C# 原生版，支持自动重置与新一轮捕获)
     /// </summary>
     public class MorseDecoderEngine
     {
@@ -16,6 +17,9 @@ namespace DeltaForceMoss.Services
         private readonly List<string> _morseGroups = new();
         private string _currentSymbols = "";
         private string _digits = "";
+
+        private Timer? _autoResetTimer;
+        private int _autoResetCountdown = 0;
 
         // 摩斯数字对应表
         private static readonly Dictionary<string, string> MorseToDigitMap = new()
@@ -32,11 +36,8 @@ namespace DeltaForceMoss.Services
             { "----.", "9" }
         };
 
-        // 简易 Goertzel 4200Hz 提示音能量检测
-        private float _lastEnergy = 0f;
         private int _toneDurationFrames = 0;
         private int _silenceDurationFrames = 0;
-        private readonly List<int> _detectedToneDurations = new();
 
         public void ProcessAudio(float[] samples, int count, int sampleRate)
         {
@@ -91,6 +92,14 @@ namespace DeltaForceMoss.Services
 
         public void AddSymbol(string symbol)
         {
+            // 如果上轮已完成 3 位，监听到新提示音时自动开辟新一轮
+            if (_digits.Length >= 3)
+            {
+                CancelAutoReset();
+                _digits = "";
+                _morseGroups.Clear();
+            }
+
             if (_currentSymbols.Length >= 5) _currentSymbols = "";
             _currentSymbols += symbol;
 
@@ -111,16 +120,49 @@ namespace DeltaForceMoss.Services
 
         private void CommitDigit(string digit)
         {
-            if (_digits.Length >= 3)
-            {
-                _digits = "";
-                _morseGroups.Clear();
-            }
             _digits += digit;
             _morseGroups.Add(_currentSymbols);
             _currentSymbols = "";
 
+            if (_digits.Length == 3)
+            {
+                StartAutoResetTimer();
+            }
+
             UpdateUI();
+        }
+
+        private void StartAutoResetTimer()
+        {
+            CancelAutoReset();
+            _autoResetCountdown = 10;
+            OnStatusUpdated?.Invoke("● 已完成破译 · 10 秒后自动重置准备下一轮");
+
+            _autoResetTimer = new Timer(state =>
+            {
+                _autoResetCountdown--;
+                if (_autoResetCountdown > 0)
+                {
+                    OnStatusUpdated?.Invoke($"● 已完成破译 · {_autoResetCountdown}s 后自动重置");
+                    OnCandidatesUpdated?.Invoke($"破译完成 · {_autoResetCountdown}s 后重置准备下一轮");
+                }
+                else
+                {
+                    CancelAutoReset();
+                    Clear();
+                    OnStatusUpdated?.Invoke("● 已自动重置 · 准备捕获下一个密码门");
+                }
+            }, null, 1000, 1000);
+        }
+
+        private void CancelAutoReset()
+        {
+            if (_autoResetTimer != null)
+            {
+                _autoResetTimer.Dispose();
+                _autoResetTimer = null;
+            }
+            _autoResetCountdown = 0;
         }
 
         public void ManualAddSymbol(string symbol)
@@ -130,6 +172,7 @@ namespace DeltaForceMoss.Services
 
         public void Clear()
         {
+            CancelAutoReset();
             _digits = "";
             _currentSymbols = "";
             _morseGroups.Clear();
