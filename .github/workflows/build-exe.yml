@@ -5,6 +5,9 @@ on:
     branches: [ main, codex ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build Single-File EXE
@@ -20,11 +23,12 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
+        shell: cmd
         run: dotnet restore windows/DeltaForceMoss/DeltaForceMoss.csproj
 
       - name: Publish Single-File EXE
-        run: |
-          dotnet publish windows/DeltaForceMoss/DeltaForceMoss.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true -o build_out
+        shell: cmd
+        run: dotnet publish windows/DeltaForceMoss/DeltaForceMoss.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o build_out
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
@@ -32,7 +36,7 @@ jobs:
           name: DeltaForceMoss-Windows-x64
           path: build_out/DeltaForceMoss.exe
 
-      - name: Publish GitHub Release (v1.0.0)
+      - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.0
