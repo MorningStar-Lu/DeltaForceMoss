@@ -848,6 +848,22 @@ footer {
   box-shadow: 0 0 12px var(--accent-glow-pri);
 }
 
+.download-btn {
+  text-decoration: none;
+  background: rgba(255, 230, 0, 0.15);
+  border-color: #ffe600;
+  color: #ffe600;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+}
+
+.download-btn:hover {
+  background: #ffe600;
+  color: #000;
+  box-shadow: 0 0 14px rgba(255, 230, 0, 0.65);
+}
+
 .compact-overlay {
   display: none;
 }

@@ -1,0 +1,49 @@
+name: Build & Release Windows EXE
+
+on:
+  push:
+    branches: [ main, codex ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Single-File EXE
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore windows/DeltaForceMoss/DeltaForceMoss.csproj
+
+      - name: Publish Single-File EXE
+        run: |
+          dotnet publish windows/DeltaForceMoss/DeltaForceMoss.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true -o build_out
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeltaForceMoss-Windows-x64
+          path: build_out/DeltaForceMoss.exe
+
+      - name: Publish GitHub Release (v1.0.0)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: DeltaForceMoss v1.0.0 (Windows 独立客户端)
+          body: |
+            ## DeltaForceMoss 摩斯破译器 Windows 独立客户端
+
+            功能特性：
+            - WASAPI 全局系统声音免弹窗监听
+            - 突破无边框窗口化游戏最高置顶悬浮窗
+            - 本地 WebSocket 广播桥接服务
+          files: build_out/DeltaForceMoss.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
