@@ -1,0 +1,1225 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+SC:wght@400;500;600;700;900&family=Orbitron:wght@500;700;900&display=swap');
+
+/* =========================================================
+   赛博液态玻璃设计系统 (Cyber Liquid Glassmorphism Tokens)
+   ========================================================= */
+:root,
+html[data-theme="cyber-neon"] {
+  --theme-id: 'cyber-neon';
+  --accent-primary: #00f0ff;      /* 电光青 */
+  --accent-secondary: #ff007f;    /* 霓虹洋红 */
+  --accent-tertiary: #9d00ff;     /* 赛博紫罗兰 */
+  --accent-glow-pri: rgba(0, 240, 255, 0.55);
+  --accent-glow-sec: rgba(255, 0, 127, 0.55);
+  --orb-1: radial-gradient(circle at 35% 35%, rgba(0, 240, 255, 0.28) 0%, rgba(0, 240, 255, 0) 70%);
+  --orb-2: radial-gradient(circle at 65% 65%, rgba(255, 0, 127, 0.25) 0%, rgba(255, 0, 127, 0) 70%);
+  --orb-3: radial-gradient(circle at 50% 50%, rgba(157, 0, 255, 0.2) 0%, rgba(157, 0, 255, 0) 75%);
+  --bg-base: #060811;
+  --panel-bg: rgba(11, 16, 28, 0.65);
+  --panel-bg-hover: rgba(16, 24, 42, 0.75);
+  --panel-border: rgba(0, 240, 255, 0.22);
+  --panel-border-hover: rgba(0, 240, 255, 0.5);
+  --glass-specular: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(0, 240, 255, 0.12) 40%, rgba(255, 0, 127, 0.08) 100%);
+  --glass-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 35px rgba(0, 240, 255, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  --text-main: #f0f6fc;
+  --text-muted: #8b9eb3;
+  --text-dim: #4d5f73;
+  --sidebar-w: 236px;
+}
+
+html[data-theme="acid-matrix"] {
+  --theme-id: 'acid-matrix';
+  --accent-primary: #25f48b;      /* 战术矩阵荧光绿 */
+  --accent-secondary: #00f0ff;    /* 特战电光青 */
+  --accent-tertiary: #bbfb06;     /* 警示酸黄 */
+  --accent-glow-pri: rgba(37, 244, 139, 0.55);
+  --accent-glow-sec: rgba(0, 240, 255, 0.55);
+  --orb-1: radial-gradient(circle at 35% 35%, rgba(37, 244, 139, 0.25) 0%, rgba(37, 244, 139, 0) 70%);
+  --orb-2: radial-gradient(circle at 65% 65%, rgba(0, 240, 255, 0.22) 0%, rgba(0, 240, 255, 0) 70%);
+  --orb-3: radial-gradient(circle at 50% 50%, rgba(187, 251, 6, 0.18) 0%, rgba(187, 251, 6, 0) 75%);
+  --bg-base: #040d0a;
+  --panel-bg: rgba(6, 20, 16, 0.65);
+  --panel-bg-hover: rgba(10, 32, 25, 0.75);
+  --panel-border: rgba(37, 244, 139, 0.25);
+  --panel-border-hover: rgba(37, 244, 139, 0.55);
+  --glass-specular: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(37, 244, 139, 0.15) 45%, rgba(0, 240, 255, 0.08) 100%);
+  --glass-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 35px rgba(37, 244, 139, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  --text-main: #edf9f4;
+  --text-muted: #86a69a;
+  --text-dim: #446156;
+}
+
+html[data-theme="night-city"] {
+  --theme-id: 'night-city';
+  --accent-primary: #ffe600;      /* 赛博金黄 */
+  --accent-secondary: #ff2a5f;    /* 霓虹炽粉 */
+  --accent-tertiary: #ff6a00;     /* 焰光橙 */
+  --accent-glow-pri: rgba(255, 230, 0, 0.55);
+  --accent-glow-sec: rgba(255, 42, 95, 0.55);
+  --orb-1: radial-gradient(circle at 35% 35%, rgba(255, 230, 0, 0.24) 0%, rgba(255, 230, 0, 0) 70%);
+  --orb-2: radial-gradient(circle at 65% 65%, rgba(255, 42, 95, 0.25) 0%, rgba(255, 42, 95, 0) 70%);
+  --orb-3: radial-gradient(circle at 50% 50%, rgba(255, 106, 0, 0.2) 0%, rgba(255, 106, 0, 0) 75%);
+  --bg-base: #0a0808;
+  --panel-bg: rgba(22, 17, 18, 0.68);
+  --panel-bg-hover: rgba(34, 25, 27, 0.78);
+  --panel-border: rgba(255, 230, 0, 0.22);
+  --panel-border-hover: rgba(255, 230, 0, 0.55);
+  --glass-specular: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 230, 0, 0.12) 45%, rgba(255, 42, 95, 0.1) 100%);
+  --glass-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 35px rgba(255, 230, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  --text-main: #fffdf2;
+  --text-muted: #ad9f92;
+  --text-dim: #635850;
+}
+
+/* =========================================================
+   全局重置与液态背景层
+   ========================================================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-main);
+  font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  line-height: 1.5;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* 液态光晕球（Fluid Ambient Orbs） */
+.liquid-orbs {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.liquid-orbs .orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(75px);
+  will-change: transform;
+  opacity: 0.85;
+}
+
+.liquid-orbs .orb-1 {
+  width: 650px;
+  height: 650px;
+  background: var(--orb-1);
+  top: -15%;
+  right: -5%;
+  animation: orbFloat1 22s ease-in-out infinite alternate;
+}
+
+.liquid-orbs .orb-2 {
+  width: 580px;
+  height: 580px;
+  background: var(--orb-2);
+  bottom: -15%;
+  left: 10%;
+  animation: orbFloat2 26s ease-in-out infinite alternate;
+}
+
+.liquid-orbs .orb-3 {
+  width: 500px;
+  height: 500px;
+  background: var(--orb-3);
+  top: 35%;
+  left: 45%;
+  animation: orbFloat3 18s ease-in-out infinite alternate;
+}
+
+@keyframes orbFloat1 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-80px, 90px) scale(1.12); }
+  100% { transform: translate(60px, 140px) scale(0.95); }
+}
+
+@keyframes orbFloat2 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(110px, -70px) scale(1.18); }
+  100% { transform: translate(-50px, -110px) scale(0.9); }
+}
+
+@keyframes orbFloat3 {
+  0% { transform: translate(0, 0) scale(0.9); }
+  50% { transform: translate(-100px, -50px) scale(1.2); }
+  100% { transform: translate(70px, 60px) scale(1.05); }
+}
+
+/* 赛博网格与微光噪点 */
+.cyber-grid {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse at 60% 40%, #000 30%, transparent 80%);
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+}
+
+/* =========================================================
+   液态玻璃悬浮侧边栏 (Floating Liquid Glass Sidebar)
+   ========================================================= */
+.sidebar {
+  position: fixed;
+  top: 18px;
+  bottom: 18px;
+  left: 18px;
+  width: var(--sidebar-w);
+  background: var(--panel-bg);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid var(--panel-border);
+  border-radius: 20px;
+  padding: 26px 18px;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sidebar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 1px;
+  background: var(--glass-specular);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: var(--text-main);
+  text-decoration: none;
+  font: 700 13px/1.1 'Orbitron', 'IBM Plex Mono', sans-serif;
+  letter-spacing: 2.5px;
+  margin: 0 4px 34px;
+  transition: transform 0.25s ease;
+}
+
+.brand:hover {
+  transform: translateX(2px);
+}
+
+.brand b {
+  color: var(--accent-primary);
+  text-shadow: 0 0 14px var(--accent-glow-pri);
+  font-weight: 900;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: #060912;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  font-size: 26px;
+  font-weight: 900;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  box-shadow: 0 0 20px var(--accent-glow-pri);
+  position: relative;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.brand:hover .brand-mark {
+  transform: rotate(5deg) scale(1.05);
+  filter: brightness(1.2);
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-item {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  padding: 11px 14px;
+  text-align: left;
+  border-radius: 12px;
+  font: 500 13px inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  transition: all 0.25s ease;
+}
+
+.nav-item span {
+  font-size: 15px;
+  color: var(--text-dim);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.nav-item:hover span {
+  color: var(--accent-primary);
+  transform: scale(1.15);
+}
+
+.nav-item.active {
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.12), rgba(255, 0, 127, 0.04));
+  color: var(--text-main);
+  border-color: var(--panel-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25), inset 0 0 12px var(--panel-border);
+}
+
+.nav-item.active span {
+  color: var(--accent-primary);
+  text-shadow: 0 0 10px var(--accent-glow-pri);
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.device-mini {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 10px 14px;
+  transition: border-color 0.25s ease;
+}
+
+.device-mini:hover {
+  border-color: var(--panel-border);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+}
+
+.device-mini div {
+  display: grid;
+  gap: 2px;
+}
+
+.device-mini small, .profile small {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.device-mini strong {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.profile {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile > div:nth-child(2) {
+  display: grid;
+  gap: 1px;
+}
+
+.profile strong {
+  font: 600 12px 'IBM Plex Mono', monospace;
+  letter-spacing: 0.5px;
+}
+
+.profile > span:last-child {
+  margin-left: auto;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font: 700 13px 'Orbitron', monospace;
+  color: var(--accent-primary);
+  background: rgba(0, 240, 255, 0.08);
+  box-shadow: 0 0 12px var(--accent-glow-pri);
+}
+
+/* =========================================================
+   主工作区与液态面板 (Main Workspace & Liquid Glass Panels)
+   ========================================================= */
+main {
+  margin-left: calc(var(--sidebar-w) + 36px);
+  min-height: 100vh;
+  padding: 26px 40px 24px 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 2;
+}
+
+/* 顶部导航与赛博状态 */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.eyebrow, .section-no, footer {
+  font: 600 10px 'Orbitron', 'IBM Plex Mono', monospace;
+  letter-spacing: 2px;
+  color: var(--accent-primary);
+  text-shadow: 0 0 8px var(--accent-glow-pri);
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 900;
+  margin: 6px 0 4px;
+  letter-spacing: -0.5px;
+  background: linear-gradient(120deg, #ffffff 40%, var(--accent-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+header p {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* 赛博液态主题切换器 (Theme Switcher Capsule) */
+.theme-capsule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--panel-border);
+  padding: 4px 10px 4px 14px;
+  border-radius: 30px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+.theme-capsule-label {
+  font: 600 10px 'Orbitron', monospace;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.theme-picker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.theme-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  background: transparent;
+  padding: 0;
+}
+
+.theme-btn::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.theme-btn[data-theme="cyber-neon"]::before {
+  background: linear-gradient(135deg, #00f0ff 50%, #ff007f 50%);
+}
+
+.theme-btn[data-theme="acid-matrix"]::before {
+  background: linear-gradient(135deg, #25f48b 50%, #00f0ff 50%);
+}
+
+.theme-btn[data-theme="night-city"]::before {
+  background: linear-gradient(135deg, #ffe600 50%, #ff2a5f 50%);
+}
+
+.theme-btn:hover {
+  transform: scale(1.2);
+}
+
+.theme-btn.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 12px var(--accent-primary);
+  transform: scale(1.15);
+}
+
+.badge {
+  font: 600 11px 'IBM Plex Mono', monospace;
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg);
+  backdrop-filter: blur(16px);
+  padding: 8px 14px;
+  border-radius: 30px;
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.badge i, .status i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--accent-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--accent-primary);
+  margin-right: 8px;
+}
+
+.icon-btn {
+  position: relative;
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg);
+  backdrop-filter: blur(16px);
+  color: var(--text-main);
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.25s ease;
+}
+
+.icon-btn:hover {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 16px var(--accent-glow-pri);
+  transform: translateY(-1px);
+}
+
+.icon-btn em {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--accent-secondary);
+  border-radius: 50%;
+  right: 8px;
+  top: 8px;
+  box-shadow: 0 0 8px var(--accent-secondary);
+}
+
+/* =========================================================
+   仪表盘与通用液态玻璃面板 (Dashboard & Panels)
+   ========================================================= */
+.dashboard {
+  display: grid;
+  grid-template-columns: minmax(520px, 1fr) 350px;
+  gap: 22px;
+  flex: 1;
+}
+
+.right-column {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 22px;
+}
+
+/* 核心液态面板 (Liquid Glass Panel) */
+.panel {
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border-radius: 20px;
+  position: relative;
+  box-shadow: var(--glass-shadow);
+  transition: border-color 0.35s ease, background 0.35s ease, transform 0.25s ease;
+  overflow: hidden;
+}
+
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 1px;
+  background: var(--glass-specular);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.panel:hover {
+  border-color: var(--panel-border-hover);
+}
+
+/* 装饰性赛博切角光标 */
+.panel::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  border-top: 2px solid var(--accent-primary);
+  border-right: 2px solid var(--accent-primary);
+  border-top-right-radius: 18px;
+  opacity: 0.7;
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.panel-head > div {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.section-no {
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  padding-right: 12px;
+}
+
+h2 {
+  font: 700 15px 'Orbitron', 'Noto Sans SC', sans-serif;
+  letter-spacing: 0.5px;
+  margin: 0;
+  color: var(--text-main);
+}
+
+.status {
+  font: 600 11px 'IBM Plex Mono', monospace;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+}
+
+.status i {
+  background: #505c6d;
+  box-shadow: none;
+}
+
+.status.live {
+  color: var(--accent-primary);
+  text-shadow: 0 0 8px var(--accent-glow-pri);
+}
+
+.status.live i {
+  background: var(--accent-primary);
+  box-shadow: 0 0 12px var(--accent-primary);
+  animation: liveBlink 1.4s infinite;
+}
+
+@keyframes liveBlink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* =========================================================
+   波形示波器视窗 (Waveform Visualizer HUD)
+   ========================================================= */
+.monitor-card {
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+}
+
+.visualizer-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 320px;
+  margin: 18px 0;
+  background: 
+    radial-gradient(ellipse at center, rgba(0, 240, 255, 0.03) 0%, transparent 70%),
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+}
+
+/* 示波器扫描线动效 */
+.visualizer-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.25) 51%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 1;
+}
+
+.empty-state {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  justify-items: center;
+  gap: 10px;
+  z-index: 2;
+  transition: opacity 0.3s ease;
+}
+
+.empty-state.hidden {
+  display: none;
+}
+
+.empty-state strong {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.empty-state small {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.pulse {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border: 1px solid var(--panel-border);
+  border-radius: 50%;
+  margin-bottom: 6px;
+  background: rgba(0, 240, 255, 0.05);
+  box-shadow: 0 0 0 10px rgba(0, 240, 255, 0.08), 0 0 35px var(--accent-glow-pri);
+  animation: pulseScale 2.4s infinite ease-out;
+}
+
+.pulse span {
+  color: var(--accent-primary);
+  font-size: 20px;
+}
+
+@keyframes pulseScale {
+  0% { transform: scale(0.96); box-shadow: 0 0 0 0 var(--panel-border), 0 0 20px var(--accent-glow-pri); }
+  50% { transform: scale(1.04); box-shadow: 0 0 0 16px rgba(0, 240, 255, 0), 0 0 40px var(--accent-glow-pri); }
+  100% { transform: scale(0.96); box-shadow: 0 0 0 0 var(--panel-border), 0 0 20px var(--accent-glow-pri); }
+}
+
+.timecode {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  font: 700 11px 'IBM Plex Mono', monospace;
+  color: var(--accent-primary);
+  text-shadow: 0 0 8px var(--accent-glow-pri);
+  z-index: 3;
+}
+
+.hz {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  color: var(--text-muted);
+  font: 600 9px 'Orbitron', 'IBM Plex Mono', monospace;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 1px;
+  z-index: 3;
+}
+
+.hz span {
+  width: 40px;
+  height: 1px;
+  background: var(--panel-border);
+}
+
+/* =========================================================
+   液态控制栏与音高数显 (Controls & Pitch Readout)
+   ========================================================= */
+.controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.select-label {
+  display: grid;
+  gap: 8px;
+  color: var(--text-muted);
+  font: 600 10px 'Orbitron', monospace;
+  letter-spacing: 1.5px;
+  flex: 1;
+}
+
+select {
+  appearance: none;
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--text-main);
+  border: 1px solid var(--panel-border);
+  padding: 12px 16px;
+  border-radius: 12px;
+  font: 500 13px 'Noto Sans SC', sans-serif;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--accent-primary) 50%), linear-gradient(135deg, var(--accent-primary) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 19px, calc(100% - 13px) 19px;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  transition: all 0.25s ease;
+}
+
+select:hover, select:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 16px var(--accent-glow-pri);
+  outline: none;
+}
+
+select option {
+  background: #090e18;
+  color: #fff;
+}
+
+/* 赛博液态主按钮 (Liquid Cyber Button) */
+.primary, .outline {
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  padding: 0 26px;
+  font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.primary {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  color: #060912;
+  box-shadow: 0 6px 20px var(--accent-glow-pri), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px var(--accent-glow-pri), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+  filter: brightness(1.15);
+}
+
+.primary:active {
+  transform: translateY(0);
+}
+
+.primary.listening {
+  background: linear-gradient(135deg, #ff007f 0%, #ff5252 100%);
+  color: #ffffff;
+  box-shadow: 0 6px 20px var(--accent-glow-sec);
+}
+
+/* 音高实时读出屏 (Pitch Readout Glass Plate) */
+.pitch-readout {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 14px 18px;
+  border: 1px solid var(--panel-border);
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 14px;
+  margin-bottom: 16px;
+}
+
+.pitch-readout span, .pitch-readout small {
+  color: var(--text-muted);
+  font: 600 11px 'Orbitron', 'IBM Plex Mono', monospace;
+  letter-spacing: 1px;
+}
+
+.pitch-readout strong {
+  color: var(--accent-primary);
+  font: 700 28px 'Orbitron', 'IBM Plex Mono', monospace;
+  text-shadow: 0 0 16px var(--accent-glow-pri);
+  letter-spacing: 1px;
+}
+
+.pitch-readout small {
+  margin-left: auto;
+  color: var(--text-dim);
+}
+
+/* 简谱输出面板 (Score Panel) */
+.score-panel {
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 14px;
+}
+
+.score-panel .panel-head {
+  margin-bottom: 10px;
+}
+
+.score-panel .panel-head span {
+  font: 600 11px 'IBM Plex Mono', monospace;
+  color: var(--accent-primary);
+}
+
+.score-panel p {
+  min-height: 44px;
+  max-height: 110px;
+  overflow: auto;
+  line-height: 1.8;
+  color: #d8e5f2;
+  font: 13px/1.8 'IBM Plex Mono', 'Noto Sans SC', monospace;
+  overflow-wrap: anywhere;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.score-panel .outline {
+  height: 38px;
+  width: 100%;
+  margin-top: 14px;
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--panel-border);
+}
+
+.outline:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  box-shadow: 0 0 18px var(--accent-glow-pri);
+}
+
+.score-panel button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   右侧栏组件 (Client Status & Activity Stream)
+   ========================================================= */
+.client-card, .activity-card {
+  padding: 24px;
+}
+
+.more, .text-btn {
+  background: none;
+  border: 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  font: 600 11px 'IBM Plex Mono', monospace;
+  transition: color 0.2s ease;
+}
+
+.more:hover, .text-btn:hover {
+  color: var(--accent-primary);
+}
+
+.connection-orb {
+  display: grid;
+  place-items: center;
+  margin: 24px auto 18px;
+}
+
+.rings {
+  width: 90px;
+  height: 90px;
+  border: 1px solid var(--panel-border);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  box-shadow: 
+    0 0 0 10px rgba(0, 240, 255, 0.06), 
+    0 0 0 20px rgba(0, 240, 255, 0.03),
+    0 0 30px var(--accent-glow-pri);
+  animation: orbSpin 12s linear infinite;
+  position: relative;
+}
+
+@keyframes orbSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.rings span {
+  font-size: 32px;
+  color: var(--accent-primary);
+  text-shadow: 0 0 14px var(--accent-glow-pri);
+}
+
+.client-card h3 {
+  text-align: center;
+  font: 700 15px 'Orbitron', 'Noto Sans SC', sans-serif;
+  margin: 0 0 8px;
+  letter-spacing: 0.5px;
+}
+
+.client-card p {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+  max-width: 260px;
+  margin: 0 auto 20px;
+}
+
+.client-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text-dim);
+}
+
+.client-meta b {
+  color: var(--text-muted);
+}
+
+.activity-card {
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+}
+
+.activity-empty {
+  text-align: center;
+  margin-top: 40px;
+  color: var(--text-dim);
+}
+
+.activity-empty span {
+  font-size: 28px;
+  color: var(--accent-primary);
+  opacity: 0.5;
+}
+
+.activity-empty p {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 8px 0 4px;
+}
+
+.activity-empty small {
+  font-size: 10px;
+}
+
+.activity-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 12px;
+}
+
+.activity-row b {
+  color: var(--accent-primary);
+  font: 700 13px 'Orbitron', monospace;
+  text-shadow: 0 0 8px var(--accent-glow-pri);
+}
+
+.activity-row time {
+  margin-left: auto;
+  color: var(--text-dim);
+  font: 10px 'IBM Plex Mono', monospace;
+}
+
+/* =========================================================
+   页脚与通知浮窗 (Footer & Toast)
+   ========================================================= */
+footer {
+  display: flex;
+  gap: 28px;
+  padding-top: 24px;
+  color: var(--text-dim);
+  font-size: 10px;
+}
+
+footer b {
+  color: var(--accent-primary);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.toast {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  padding: 14px 22px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--accent-primary);
+  border-radius: 12px;
+  color: var(--text-main);
+  font: 700 12px 'Orbitron', 'Noto Sans SC', sans-serif;
+  letter-spacing: 0.5px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 25px var(--accent-glow-pri);
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 99;
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* =========================================================
+   响应式适配 (Responsive Media Queries)
+   ========================================================= */
+@media (max-width: 980px) {
+  :root {
+    --sidebar-w: 78px;
+  }
+  .brand span:last-child, .nav-item span:last-child {
+    display: none;
+  }
+  .brand {
+    margin-left: 0;
+    justify-content: center;
+  }
+  .brand-mark {
+    flex: none;
+  }
+  .nav-item {
+    justify-content: center;
+    padding: 12px 0;
+  }
+  .nav-item span:first-child {
+    font-size: 18px;
+  }
+  .device-mini, .profile > div:nth-child(2), .profile > span {
+    display: none;
+  }
+  .profile {
+    justify-content: center;
+  }
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+  .right-column {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+  }
+  main {
+    padding: 26px 24px;
+  }
+}
+
+@media (max-width: 680px) {
+  .sidebar {
+    display: none;
+  }
+  main {
+    margin: 0;
+    padding: 20px 16px;
+  }
+  .dashboard {
+    display: block;
+  }
+  .right-column {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-top: 20px;
+  }
+  .monitor-card {
+    min-height: 520px;
+  }
+  .controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .primary {
+    width: 100%;
+  }
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .badge {
+    display: none;
+  }
+  footer {
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .spacer {
+    display: none;
+  }
+}

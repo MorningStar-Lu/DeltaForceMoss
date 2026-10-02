@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#171d1d" />
+  <title>摩斯密码门解码台 · Delta Force Audio</title>
+  <link rel="stylesheet" href="morse.css" />
+  <link rel="stylesheet" href="morse-controls.css" />
+</head>
+<body>
+  <div class="grain"></div>
+  <div class="cyber-grid" aria-hidden="true"></div>
+  <div class="liquid-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <main class="shell">
+    <header class="topbar">
+      <a href="index.html" class="back">← 声音监听台</a>
+      <div class="theme-capsule" data-theme-switcher title="切换赛博液态主题">
+        <span class="theme-capsule-label" id="currentThemeName">电光新东京</span>
+        <div class="theme-picker">
+          <button class="theme-btn active" data-theme="cyber-neon" title="电光新东京 (青/粉)" type="button"></button>
+          <button class="theme-btn" data-theme="acid-matrix" title="战术矩阵 (绿/青)" type="button"></button>
+          <button class="theme-btn" data-theme="night-city" title="夜之城 (金/橙)" type="button"></button>
+        </div>
+      </div>
+      <span class="top-tag">LOCAL · MORSE / 01</span>
+    </header>
+
+    <section class="machine" aria-labelledby="title">
+      <div class="machine-heading"><span>最高机密</span><span>GTI / AUDIO</span></div>
+      <h1 id="title" data-text="三角洲摩斯密码门破译器">三角洲摩斯密码门破译器</h1>
+      <p class="subtitle">监听提示音，显示三位密码。识别结果请以游戏内反馈核对。</p>
+
+      <div class="display-frame">
+        <div class="display">
+          <div class="display-top">
+            <span class="small-label">实时解码</span>
+            <div class="display-actions">
+              <button id="pipToggleBtn" class="compact-btn" type="button" title="开启系统画中画置顶悬浮窗 (Chrome/Edge)">📺 画中画悬浮窗</button>
+              <button id="compactToggleBtn" class="compact-btn" type="button" title="切换页面内极简浮窗">🗖 页面内浮窗</button>
+              <button id="historyBtn" type="button">历史 <span id="historyCount">0</span></button>
+            </div>
+          </div>
+          <div class="digits" id="digits" aria-live="polite">───</div>
+          <div class="display-divider"></div>
+          <div class="readout"><span>点划记录（候选）</span><strong id="symbols">等待信号</strong></div>
+          <div class="readout"><span>当前组进度</span><strong id="pulseProgress">0/5</strong></div>
+          <div class="readout"><span>当前结果</span><strong id="currentResult">—</strong></div>
+          <div class="readout"><span>提示音频率</span><strong id="frequency">未锁定</strong></div>
+        </div>
+      </div>
+
+      <!-- 极简浮窗 (Compact Overlay) -->
+      <div id="compactOverlay" class="compact-overlay" hidden>
+        <div class="compact-drag-handle">
+          <span class="compact-title">密码门破译 · 浮窗</span>
+          <button id="exitCompactBtn" class="compact-exit-btn" type="button" title="展开全功能面板">🗗 展开</button>
+        </div>
+        <div class="compact-body">
+          <div class="compact-digits-wrapper">
+            <span class="compact-label">解码密码</span>
+            <div id="compactDigits" class="compact-digits">───</div>
+          </div>
+          <div class="compact-divider"></div>
+          <div class="compact-readout">
+            <span class="compact-label">候选斜杠 / 点划</span>
+            <div id="compactCandidate" class="compact-candidate">/ / / (等待信号)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="control-grid">
+        <div class="source-control">
+          <label for="source">输入来源</label>
+          <select id="source">
+            <option value="wasapi">⚡ 免弹窗 · 全局系统声音 (需后台桥接)</option>
+            <option value="screen">系统 / 游戏共享音频 (浏览器弹窗)</option>
+            <option value="mic">麦克风</option>
+            <option value="file">本地音频文件</option>
+          </select>
+          <input id="audioFile" type="file" accept="audio/*" hidden />
+          <p id="sourceDesc">免弹窗模式读取 Windows 全局声音（需运行桌面端或后台音频服务）。</p>
+        </div>
+        <div class="power-block">
+          <span>电源</span>
+          <button id="powerBtn" class="power" type="button" aria-label="开始监听" aria-pressed="false"><span></span></button>
+        </div>
+      </div>
+
+      <div class="status-row"><span class="lamp" id="lamp"></span><span id="status">待机 · 点击电源开始</span><span id="signalLevel">信号 —</span></div>
+      <p class="rolling-status" id="rollingStatus" aria-live="polite">滚动复核：待机</p>
+      <div class="search-row"><button id="searchBtn" type="button" disabled>↻ 重新搜索</button><span>开始监听后自动寻找完整的提示音组，无需手动校准。</span></div>
+      <div class="search-row" id="diagnosticRow" hidden><button id="diagnosticBtn" type="button" disabled>● 开始诊断录制</button><span id="diagnosticNote">仅在点击后录制当前输入的音频及识别日志；停止时下载到本机，不会上传。可能录到语音，分享前请检查。最长 2 分钟。</span></div>
+      <div class="hint-box"><span>提示</span><p id="hint">连续五段同频提示音构成有效数字时才显示结果，也可用下方按钮手动校对。</p></div>
+
+      <details class="manual">
+        <summary>手动输入 / 校对</summary>
+        <p>每组五个符号自动转换为一位数字。音频识别不确定时，可手动修正。</p>
+        <div class="manual-actions">
+          <button id="dotBtn" type="button">· <small>短音</small></button>
+          <button id="dashBtn" type="button">— <small>长音</small></button>
+          <button id="undoBtn" type="button">↶ <small>撤销</small></button>
+          <button id="resetBtn" type="button">⌁ <small>清空本轮</small></button>
+        </div>
+      </details>
+
+      <section class="history" id="historyPanel" hidden aria-label="解码历史">
+        <div class="section-head"><h2>本次历史</h2><button id="clearHistoryBtn" type="button">清空</button></div>
+        <div id="historyList" class="history-list"><p class="empty">还没有解码记录</p></div>
+      </section>
+
+      <footer><span>编号：MORNING-STAR-YVINUS</span><span>浏览器实验版 · 无上传</span></footer>
+    </section>
+  </main>
+  <script type="module" src="morse.js"></script>
+</body>
+</html>

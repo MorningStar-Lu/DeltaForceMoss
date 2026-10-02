@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>节奏教练 · Delta Force Audio</title>
+  <link rel="stylesheet" href="coach.css" />
+</head>
+<body>
+  <header class="page-head">
+    <a href="index.html">← 声音监听台</a>
+    <div><small>LOCAL / COACH PREVIEW</small><h1>节奏教练</h1><p>参考悬浮教练的第一版：只显示演奏提示，不会自动发送按键。</p></div>
+  </header>
+  <main class="layout">
+    <section class="setup" aria-label="曲谱与教练设置">
+      <h2>曲谱</h2>
+      <p class="help">可导入声音监听台导出的 TXT：首行 <code>BPM=120</code>，后续为空格分隔的简谱。默认每音一拍；<code>1:0.5</code> 表示半拍。</p>
+      <textarea id="scoreInput" spellcheck="false" aria-label="曲谱内容">BPM=120
+1 2 3 5 5 3 2 1 0 5:2 3 2 1</textarea>
+      <div class="row">
+        <button id="loadBtn" class="primary">载入曲谱</button>
+        <button id="importBtn">导入 TXT</button>
+        <input id="scoreFile" type="file" accept=".txt,text/plain" hidden />
+      </div>
+      <p id="parseStatus" class="hint" role="status">示例曲谱已就绪。</p>
+      <div class="divider"></div>
+      <h2>演奏预览</h2>
+      <label>模式<select id="mode"><option value="auto">按 BPM 自动走谱</option><option value="wait">等待按空格逐音前进</option></select></label>
+      <label>速度 <output id="speedValue">1.00×</output><input id="speed" type="range" min="0.5" max="2" step="0.05" value="1" /></label>
+      <div class="row">
+        <button id="playBtn" class="primary">开始</button>
+        <button id="resetBtn">回到开头</button>
+      </div>
+      <div class="divider"></div>
+      <h2>小窗外观</h2>
+      <label>透明度 <output id="opacityValue">100%</output><input id="opacity" type="range" min="40" max="100" step="5" value="100" /></label>
+      <label>大小 <output id="scaleValue">100%</output><input id="scale" type="range" min="75" max="150" step="5" value="100" /></label>
+      <div class="row">
+        <button id="pipBtn">画中画小窗</button>
+        <button id="showBtn">显示面板</button>
+      </div>
+      <p class="hint">拖动面板顶部可调整页面内位置；按 H 快速隐藏/显示。画中画是否置顶取决于浏览器与游戏显示模式，独占全屏不保证可见。</p>
+    </section>
+    <section id="panelDock" class="dock" aria-label="教练面板预览">
+      <div id="coachPanel" class="coach-panel">
+        <div id="dragHandle" class="panel-head"><span>⌁ 节奏教练 · 预览</span><button id="hideBtn" aria-label="隐藏教练面板">×</button></div>
+        <div class="panel-body">
+          <div class="meta"><span id="coachState">待机</span><span id="coachBpm">120 BPM</span></div>
+          <div class="note-grid">
+            <div><small>当前音符</small><strong id="currentNote">1</strong></div>
+            <div><small>下一个音符</small><strong id="nextNote">2</strong></div>
+          </div>
+          <div class="timeline" id="timeline" aria-label="后续音符"></div>
+          <div class="progress-track"><div id="progressFill"></div></div>
+          <div class="progress-meta"><span id="progressText">1 / 13</span><span id="coachPrompt">准备开始</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="coach.js"></script>
+</body>
+</html>

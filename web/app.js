@@ -1,4 +1,5 @@
 import { detectPitch, toJianpu } from './pitch.js';
+import { initThemeSwitcher } from './theme.js';
 
 const $ = selector => document.querySelector(selector);
 const canvas = $('#visualizer');
@@ -12,6 +13,8 @@ let lastNote = null;
 let lastCheck = 0;
 let toastTimer = 0;
 let lastCapture = [];
+
+initThemeSwitcher();
 
 function notify(message) {
   $('#toast').textContent = message;
@@ -64,11 +67,31 @@ function draw() {
   analyser.getFloatTimeDomainData(samples);
   const width = canvas.clientWidth, height = canvas.clientHeight;
   context2d.clearRect(0, 0, width, height);
+
+  // 动态读取当前赛博液态主题的色彩
+  const computed = getComputedStyle(document.documentElement);
+  const priColor = computed.getPropertyValue('--accent-primary').trim() || '#00f0ff';
+  const secColor = computed.getPropertyValue('--accent-secondary').trim() || '#ff007f';
+
+  // 绘制中心细准线
   context2d.beginPath();
-  context2d.strokeStyle = '#caff3d';
-  context2d.lineWidth = 1.5;
-  context2d.shadowBlur = 10;
-  context2d.shadowColor = '#caff3d';
+  context2d.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+  context2d.lineWidth = 1;
+  context2d.moveTo(0, height / 2);
+  context2d.lineTo(width, height / 2);
+  context2d.stroke();
+
+  // 赛博液态渐变波形
+  const gradient = context2d.createLinearGradient(0, 0, width, 0);
+  gradient.addColorStop(0, priColor);
+  gradient.addColorStop(0.5, secColor);
+  gradient.addColorStop(1, priColor);
+
+  context2d.beginPath();
+  context2d.strokeStyle = gradient;
+  context2d.lineWidth = 2.2;
+  context2d.shadowBlur = 14;
+  context2d.shadowColor = priColor;
   samples.forEach((value, index) => {
     const x = index / (samples.length - 1) * width;
     const y = (1 - value) * height / 2;
@@ -191,5 +214,7 @@ $('#clearBtn').addEventListener('click', () => {
 });
 $('#connectBtn').addEventListener('click', () => notify('桌面客户端桥接尚未实现，请先选择浏览器音频源'));
 document.querySelectorAll('.nav-item[data-view]').forEach(item => item.addEventListener('click', () => {
+  if (item.dataset.view === 'morse') { window.location.assign('morse.html'); return; }
+  if (item.dataset.view === 'coach') { window.location.assign('coach.html'); return; }
   if (item.dataset.view !== 'monitor') notify('此模块将在后续版本开放');
 }));
