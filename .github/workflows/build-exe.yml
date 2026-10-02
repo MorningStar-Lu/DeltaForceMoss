@@ -24,11 +24,11 @@ jobs:
 
       - name: Restore dependencies
         shell: cmd
-        run: dotnet restore windows/DeltaForceMoss/DeltaForceMoss.csproj
+        run: dotnet restore windows/DeltaForceMoss/DeltaForceMoss.csproj -r win-x64
 
       - name: Publish Single-File EXE
         shell: cmd
-        run: dotnet publish windows/DeltaForceMoss/DeltaForceMoss.csproj -c Release -o build_out
+        run: dotnet publish windows/DeltaForceMoss/DeltaForceMoss.csproj -c Release -r win-x64 -o build_out
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
