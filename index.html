@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#07100e" />
+  <title>Delta Force · 声音监听台</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="grain"></div>
+  <aside class="sidebar">
+    <a class="brand" href="#" aria-label="Delta Force 首页">
+      <span class="brand-mark">Δ</span><span>DELTA<br><b>FORCE</b></span>
+    </a>
+    <nav aria-label="主导航">
+      <button class="nav-item active" data-view="monitor"><span>◉</span>声音监听</button>
+      <button class="nav-item" data-view="library"><span>♫</span>音源库</button>
+      <button class="nav-item" data-view="mapping"><span>⌁</span>按键映射</button>
+      <button class="nav-item" data-view="history"><span>↺</span>监听记录</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="device-mini"><span class="dot"></span><div><small>桌面客户端</small><strong>等待连接</strong></div></div>
+      <button class="nav-item" id="settings"><span>⚙</span>偏好设置</button>
+      <div class="profile"><div class="avatar">R</div><div><strong>ROOKIE_01</strong><small>本地用户</small></div><span>•••</span></div>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <div><div class="eyebrow">AUDIO COMMAND CENTER / 01</div><h1>声音监听台</h1><p>捕获应用声音，实时分析并触发你的演奏指令。</p></div>
+      <div class="header-actions"><span class="badge"><i></i> 本地模式</span><button class="icon-btn" aria-label="通知">♢<em></em></button></div>
+    </header>
+
+    <section class="dashboard">
+      <article class="panel monitor-card">
+        <div class="panel-head"><div><span class="section-no">01</span><h2>实时音频波形</h2></div><div class="status" id="status"><i></i>待机</div></div>
+        <div class="visualizer-wrap">
+          <canvas id="visualizer" aria-label="实时音频波形"></canvas>
+          <div class="empty-state" id="emptyState"><div class="pulse"><span>◉</span></div><strong>等待声音输入</strong><small>连接桌面客户端或选择浏览器音频源</small></div>
+          <div class="timecode" id="timecode">00:00:00</div>
+          <div class="hz">20 HZ <span></span> 20 KHZ</div>
+        </div>
+        <div class="controls">
+          <label class="select-label">输入来源<select id="source"><option value="screen">系统 / 应用声音</option><option value="mic">麦克风</option><option value="file">本地音频文件</option></select></label>
+          <button class="primary" id="listenBtn"><span>▶</span> 开始监听</button>
+          <input id="fileInput" type="file" accept="audio/*" hidden>
+        </div>
+      </article>
+
+      <aside class="right-column">
+        <article class="panel client-card">
+          <div class="panel-head"><div><span class="section-no">02</span><h2>客户端状态</h2></div><button class="more">•••</button></div>
+          <div class="connection-orb"><div class="rings"><span>⌁</span></div></div>
+          <h3>未连接桌面客户端</h3><p>启动 Delta Force 客户端后，网页将自动发现并建立连接。</p>
+          <button class="outline" id="connectBtn">搜索客户端 <span>→</span></button>
+          <div class="client-meta"><span>推荐版本</span><b>Windows 10 / 11</b></div>
+        </article>
+
+        <article class="panel activity-card">
+          <div class="panel-head"><div><span class="section-no">03</span><h2>最近活动</h2></div><button class="text-btn" id="clearBtn">清空</button></div>
+          <div id="activityList"><div class="activity-empty"><span>⌁</span><p>还没有监听记录</p><small>识别到的音符和事件会出现在这里</small></div></div>
+        </article>
+      </aside>
+    </section>
+
+    <footer><span>DELTA FORCE AUDIO ENGINE</span><span>延迟 <b id="latency">-- MS</b></span><span>采样率 <b id="sampleRate">-- KHZ</b></span><span class="spacer"></span><span>BUILD 0.1.0 ALPHA</span></footer>
+  </main>
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
