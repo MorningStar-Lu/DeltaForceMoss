@@ -2,9 +2,8 @@
 **/.DS_Store
 
 # 第三方安装包、提取文件与本地分析工具
-/temp exe/original/
-/temp exe/extracted/
-/temp exe/tools/
+/temp exe/*
+!/temp exe/README.md
 
 # 未来各平台构建输出
 **/bin/
