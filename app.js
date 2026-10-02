@@ -1,9 +1,195 @@
-const canvas=document.querySelector('#visualizer');const ctx=canvas.getContext('2d');const btn=document.querySelector('#listenBtn');const source=document.querySelector('#source');const empty=document.querySelector('#emptyState');const statusEl=document.querySelector('#status');const toast=document.querySelector('#toast');let audioContext,analyser,stream,raf,startedAt;
-function notify(message){toast.textContent=message;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2200)}
-function resize(){const dpr=devicePixelRatio||1;canvas.width=canvas.clientWidth*dpr;canvas.height=canvas.clientHeight*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);resize();
-function draw(){const w=canvas.clientWidth,h=canvas.clientHeight;ctx.clearRect(0,0,w,h);const data=new Uint8Array(analyser.frequencyBinCount);analyser.getByteTimeDomainData(data);ctx.beginPath();ctx.strokeStyle='#caff3d';ctx.lineWidth=1.5;ctx.shadowBlur=10;ctx.shadowColor='#caff3d';data.forEach((v,i)=>{const x=i/(data.length-1)*w,y=v/255*h;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();ctx.shadowBlur=0;const elapsed=Date.now()-startedAt;const d=new Date(elapsed);document.querySelector('#timecode').textContent=`${String(d.getUTCHours()).padStart(2,'0')}:${String(d.getUTCMinutes()).padStart(2,'0')}:${String(d.getUTCSeconds()).padStart(2,'0')}`;raf=requestAnimationFrame(draw)}
-async function start(inputStream){audioContext=new AudioContext();analyser=audioContext.createAnalyser();analyser.fftSize=2048;audioContext.createMediaStreamSource(inputStream).connect(analyser);stream=inputStream;startedAt=Date.now();empty.classList.add('hidden');statusEl.classList.add('live');statusEl.innerHTML='<i></i>监听中';btn.classList.add('listening');btn.innerHTML='<span>■</span> 停止监听';document.querySelector('#sampleRate').textContent=`${(audioContext.sampleRate/1000).toFixed(1)} KHZ`;document.querySelector('#latency').textContent=`${Math.round((audioContext.baseLatency||.01)*1000)} MS`;draw();addActivity('音频源已连接')}
-function stop(){cancelAnimationFrame(raf);stream?.getTracks().forEach(t=>t.stop());audioContext?.close();stream=null;empty.classList.remove('hidden');statusEl.classList.remove('live');statusEl.innerHTML='<i></i>待机';btn.classList.remove('listening');btn.innerHTML='<span>▶</span> 开始监听';document.querySelector('#latency').textContent='-- MS';document.querySelector('#sampleRate').textContent='-- KHZ'}
-async function toggle(){if(stream)return stop();try{if(source.value==='file'){document.querySelector('#fileInput').click();return}const constraints=source.value==='mic'?{audio:true}:{video:true,audio:true};const s=source.value==='mic'?await navigator.mediaDevices.getUserMedia(constraints):await navigator.mediaDevices.getDisplayMedia(constraints);if(!s.getAudioTracks().length){s.getTracks().forEach(t=>t.stop());throw new Error('所选来源没有可用音轨')}await start(s)}catch(e){notify(e.message||'无法访问音频源')}}
-function addActivity(label){const list=document.querySelector('#activityList');if(list.querySelector('.activity-empty'))list.innerHTML='';const row=document.createElement('div');row.className='activity-row';row.innerHTML=`<b>◉</b><span>${label}</span><time>${new Date().toLocaleTimeString('zh-CN',{hour12:false})}</time>`;list.prepend(row)}
-btn.addEventListener('click',toggle);document.querySelector('#fileInput').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;const audio=new Audio(URL.createObjectURL(file));audio.loop=true;audioContext=new AudioContext();analyser=audioContext.createAnalyser();const media=audioContext.createMediaElementSource(audio);media.connect(analyser);analyser.connect(audioContext.destination);await audio.play();stream={getTracks:()=>[],file:true};startedAt=Date.now();empty.classList.add('hidden');statusEl.classList.add('live');statusEl.innerHTML='<i></i>播放中';btn.classList.add('listening');btn.innerHTML='<span>■</span> 停止监听';document.querySelector('#sampleRate').textContent=`${(audioContext.sampleRate/1000).toFixed(1)} KHZ`;draw();addActivity(`载入 ${file.name}`)});document.querySelector('#connectBtn').onclick=()=>notify('正在搜索局域网客户端…');document.querySelector('#clearBtn').onclick=()=>{document.querySelector('#activityList').innerHTML='<div class="activity-empty"><span>⌁</span><p>还没有监听记录</p><small>识别到的音符和事件会出现在这里</small></div>';notify('记录已清空')};document.querySelectorAll('.nav-item[data-view]').forEach(item=>item.onclick=()=>{document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));item.classList.add('active');if(item.dataset.view!=='monitor')notify('此模块将在后续版本开放')});
+import { detectPitch, toJianpu } from './pitch.js';
+
+const $ = selector => document.querySelector(selector);
+const canvas = $('#visualizer');
+const context2d = canvas.getContext('2d');
+const button = $('#listenBtn');
+let current = null;
+let frame = 0;
+let candidate = null;
+let stableFrames = 0;
+let lastNote = null;
+let lastCheck = 0;
+let toastTimer = 0;
+let lastCapture = [];
+
+function notify(message) {
+  $('#toast').textContent = message;
+  $('#toast').classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $('#toast').classList.remove('show'), 2600);
+}
+function resize() {
+  const ratio = devicePixelRatio || 1;
+  canvas.width = canvas.clientWidth * ratio;
+  canvas.height = canvas.clientHeight * ratio;
+  context2d.setTransform(ratio, 0, 0, ratio, 0, 0);
+}
+window.addEventListener('resize', resize);
+resize();
+function activity(message) {
+  const list = $('#activityList');
+  if (list.querySelector('.activity-empty')) list.replaceChildren();
+  const row = document.createElement('div');
+  row.className = 'activity-row';
+  const icon = document.createElement('b');
+  icon.textContent = '◉';
+  const label = document.createElement('span');
+  label.textContent = message;
+  const time = document.createElement('time');
+  time.textContent = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+  row.append(icon, label, time);
+  list.prepend(row);
+  while (list.children.length > 8) list.lastElementChild.remove();
+}
+function updateScore() {
+  const notes = current?.notes || lastCapture;
+  $('#noteCount').textContent = `${notes.length} 个音符`;
+  $('#noteOutput').textContent = notes.length
+    ? notes.map(note => toJianpu(note.midi)).join(' ')
+    : '开始监听后，识别出的单音旋律会显示在这里。';
+  $('#exportBtn').disabled = notes.length === 0;
+}
+function setActive(active, label = '监听中') {
+  $('#emptyState').classList.toggle('hidden', active);
+  $('#status').classList.toggle('live', active);
+  $('#status').innerHTML = active ? `<i></i>${label}` : '<i></i>待机';
+  button.classList.toggle('listening', active);
+  button.innerHTML = active ? '<span>■</span> 停止监听' : '<span>▶</span> 开始监听';
+}
+function draw() {
+  if (!current) return;
+  const { analyser, audioContext, startedAt } = current;
+  const samples = new Float32Array(analyser.fftSize);
+  analyser.getFloatTimeDomainData(samples);
+  const width = canvas.clientWidth, height = canvas.clientHeight;
+  context2d.clearRect(0, 0, width, height);
+  context2d.beginPath();
+  context2d.strokeStyle = '#caff3d';
+  context2d.lineWidth = 1.5;
+  context2d.shadowBlur = 10;
+  context2d.shadowColor = '#caff3d';
+  samples.forEach((value, index) => {
+    const x = index / (samples.length - 1) * width;
+    const y = (1 - value) * height / 2;
+    if (index) context2d.lineTo(x, y); else context2d.moveTo(x, y);
+  });
+  context2d.stroke();
+  context2d.shadowBlur = 0;
+  const elapsed = Math.floor((performance.now() - startedAt) / 1000);
+  $('#timecode').textContent = `${String(Math.floor(elapsed / 3600)).padStart(2, '0')}:${String(Math.floor(elapsed / 60) % 60).padStart(2, '0')}:${String(elapsed % 60).padStart(2, '0')}`;
+  if (performance.now() - lastCheck >= 100) {
+    lastCheck = performance.now();
+    const pitch = detectPitch(samples, audioContext.sampleRate);
+    const midi = pitch?.midi ?? null;
+    $('#currentNote').textContent = midi === null ? '—' : toJianpu(midi);
+    $('#frequency').textContent = pitch ? `${Math.round(pitch.frequency)} Hz` : '等待稳定音高';
+    if (midi === candidate) stableFrames++; else { candidate = midi; stableFrames = 1; }
+    if (midi !== null && stableFrames >= 3 && midi !== lastNote) {
+      lastNote = midi;
+      current.notes.push({ midi, at: performance.now() - startedAt });
+      updateScore();
+      activity(`识别到 ${toJianpu(midi)}`);
+    }
+    if (midi === null && stableFrames >= 3) lastNote = null;
+  }
+  frame = requestAnimationFrame(draw);
+}
+async function stop() {
+  if (!current) return;
+  const ended = current;
+  current = null;
+  lastCapture = ended.notes;
+  cancelAnimationFrame(frame);
+  ended.stream?.getTracks().forEach(track => track.stop());
+  if (ended.audio) { ended.audio.pause(); ended.audio.removeAttribute('src'); ended.audio.load(); }
+  if (ended.url) URL.revokeObjectURL(ended.url);
+  await ended.audioContext.close();
+  setActive(false);
+  $('#currentNote').textContent = '—';
+  $('#frequency').textContent = '等待稳定音高';
+  $('#latency').textContent = '-- MS';
+  $('#sampleRate').textContent = '-- KHZ';
+  $('#timecode').textContent = '00:00:00';
+  candidate = lastNote = null;
+  stableFrames = 0;
+  activity('监听已停止');
+}
+async function start({ stream = null, file = null, label }) {
+  const audioContext = new AudioContext();
+  const analyser = audioContext.createAnalyser();
+  analyser.fftSize = 4096;
+  let audio = null, url = null;
+  try {
+    if (file) {
+      url = URL.createObjectURL(file);
+      audio = new Audio(url);
+      const source = audioContext.createMediaElementSource(audio);
+      source.connect(analyser);
+      source.connect(audioContext.destination);
+      await audio.play();
+    } else audioContext.createMediaStreamSource(stream).connect(analyser);
+    lastCapture = [];
+    current = { audioContext, analyser, stream, audio, url, label, notes: [], startedAt: performance.now() };
+    if (audio) audio.addEventListener('ended', stop, { once: true });
+    stream?.getAudioTracks().forEach(track => track.addEventListener('ended', stop, { once: true }));
+    setActive(true, audio ? '播放中' : '监听中');
+    $('#sampleRate').textContent = `${(audioContext.sampleRate / 1000).toFixed(1)} KHZ`;
+    $('#latency').textContent = audioContext.baseLatency ? `${Math.round(audioContext.baseLatency * 1000)} MS` : '-- MS';
+    updateScore();
+    activity(`已连接 ${label}`);
+    draw();
+  } catch (error) {
+    stream?.getTracks().forEach(track => track.stop());
+    audio?.pause();
+    if (url) URL.revokeObjectURL(url);
+    await audioContext.close();
+    throw error;
+  }
+}
+async function toggle() {
+  if (current) { await stop(); return; }
+  const kind = $('#source').value;
+  if (kind === 'file') { $('#fileInput').click(); return; }
+  try {
+    const stream = kind === 'mic'
+      ? await navigator.mediaDevices.getUserMedia({ audio: true })
+      : await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+    if (!stream.getAudioTracks().length) {
+      stream.getTracks().forEach(track => track.stop());
+      throw new Error('所选来源没有音轨；分享时请勾选“共享音频”');
+    }
+    await start({ stream, label: kind === 'mic' ? '麦克风' : '系统 / 应用声音' });
+  } catch (error) { notify(error.message || '无法访问音频源'); }
+}
+button.addEventListener('click', toggle);
+$('#source').addEventListener('change', () => { if (current) stop(); });
+$('#fileInput').addEventListener('change', async event => {
+  const file = event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  try { await start({ file, label: file.name }); }
+  catch (error) { notify(error.message || '无法播放此音频文件'); }
+});
+$('#exportBtn').addEventListener('click', () => {
+  const notes = current?.notes || lastCapture;
+  if (!notes.length) return;
+  const gaps = notes.slice(1).map((note, index) => note.at - notes[index].at).filter(ms => ms > 150 && ms < 2000);
+  const median = gaps.length ? gaps.sort((a, b) => a - b)[Math.floor(gaps.length / 2)] : 500;
+  const bpm = Math.max(40, Math.min(200, Math.round(60000 / median)));
+  const content = `BPM=${bpm}\n${notes.map(note => toJianpu(note.midi)).join(' ')}\n`;
+  const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `delta-jianpu-${new Date().toISOString().slice(0, 10)}.txt`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+$('#clearBtn').addEventListener('click', () => {
+  $('#activityList').innerHTML = '<div class="activity-empty"><span>⌁</span><p>还没有监听记录</p><small>识别到的音符和事件会出现在这里</small></div>';
+  notify('活动记录已清空');
+});
+$('#connectBtn').addEventListener('click', () => notify('桌面客户端桥接尚未实现，请先选择浏览器音频源'));
+document.querySelectorAll('.nav-item[data-view]').forEach(item => item.addEventListener('click', () => {
+  if (item.dataset.view !== 'monitor') notify('此模块将在后续版本开放');
+}));

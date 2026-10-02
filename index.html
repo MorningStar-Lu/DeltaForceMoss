@@ -28,7 +28,7 @@
 
   <main>
     <header>
-      <div><div class="eyebrow">AUDIO COMMAND CENTER / 01</div><h1>声音监听台</h1><p>捕获应用声音，实时分析并触发你的演奏指令。</p></div>
+      <div><div class="eyebrow">AUDIO COMMAND CENTER / 01</div><h1>声音监听台</h1><p>捕获声音，识别单音旋律并整理为简谱。</p></div>
       <div class="header-actions"><span class="badge"><i></i> 本地模式</span><button class="icon-btn" aria-label="通知">♢<em></em></button></div>
     </header>
 
@@ -46,14 +46,20 @@
           <button class="primary" id="listenBtn"><span>▶</span> 开始监听</button>
           <input id="fileInput" type="file" accept="audio/*" hidden>
         </div>
+        <div class="pitch-readout" aria-live="polite"><span>当前音高</span><strong id="currentNote">—</strong><small id="frequency">等待稳定音高</small></div>
+        <section class="score-panel" aria-label="识别简谱">
+          <div class="panel-head"><h2>识别简谱</h2><span id="noteCount">0 个音符</span></div>
+          <p id="noteOutput">开始监听后，识别出的单音旋律会显示在这里。</p>
+          <button class="outline" id="exportBtn" disabled>导出 TXT 简谱 <span>↓</span></button>
+        </section>
       </article>
 
       <aside class="right-column">
         <article class="panel client-card">
           <div class="panel-head"><div><span class="section-no">02</span><h2>客户端状态</h2></div><button class="more">•••</button></div>
           <div class="connection-orb"><div class="rings"><span>⌁</span></div></div>
-          <h3>未连接桌面客户端</h3><p>启动 Delta Force 客户端后，网页将自动发现并建立连接。</p>
-          <button class="outline" id="connectBtn">搜索客户端 <span>→</span></button>
+          <h3>桌面客户端尚未接入</h3><p>当前可直接使用浏览器音频源。客户端桥接仍在开发中。</p>
+          <button class="outline" id="connectBtn">了解连接状态 <span>→</span></button>
           <div class="client-meta"><span>推荐版本</span><b>Windows 10 / 11</b></div>
         </article>
 
@@ -67,6 +73,6 @@
     <footer><span>DELTA FORCE AUDIO ENGINE</span><span>延迟 <b id="latency">-- MS</b></span><span>采样率 <b id="sampleRate">-- KHZ</b></span><span class="spacer"></span><span>BUILD 0.1.0 ALPHA</span></footer>
   </main>
   <div class="toast" id="toast"></div>
-  <script src="app.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
