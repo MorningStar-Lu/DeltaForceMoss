@@ -1,0 +1,21 @@
+<Window x:Class="DeltaForceMoss.Performance.PerformanceWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="口琴自动演奏" Width="620" Height="560" Background="#101922" Foreground="White" WindowStartupLocation="CenterScreen">
+<ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="24">
+<TextBlock Text="口琴自动演奏" FontSize="24" FontWeight="Bold"/>
+<TextBlock Text="导入编辑器导出的鼠鼠 JSON 曲谱；F8 紧急停止并释放按键。" Margin="0,12" TextWrapping="Wrap"/>
+<Button Name="Import" Content="选择曲谱 JSON" Click="Import_Click" Padding="12"/>
+<TextBlock Name="Song" Text="尚未载入曲谱" Margin="0,10" TextWrapping="Wrap"/>
+<TextBlock Text="输入方式"/>
+<ComboBox Name="Backend" SelectedIndex="0" Margin="0,6,0,12"><ComboBoxItem Content="SendInput · Windows 软件输入"/><ComboBoxItem Content="SKSimulator · 外接键鼠模拟器"/></ComboBox>
+<Expander Header="SK 设备设置（仅 SKSimulator 使用）"><StackPanel Margin="0,10">
+<TextBlock Text="设备 VID / PID（十进制或 0x 十六进制；65536 为不限条件）"/>
+<UniformGrid Columns="2"><TextBox Name="Vid" Text="65536" Margin="0,6,6,6"/><TextBox Name="Pid" Text="65536" Margin="0,6"/></UniformGrid>
+<TextBlock Text="键盘校验数据"/><PasswordBox Name="Verify" Margin="0,6"/>
+<TextBlock Text="鼠标校验数据（留空使用相同数据）"/><PasswordBox Name="MouseVerify" Margin="0,6"/>
+<TextBlock Text="需设备已连接；x64/skm.dll 随包附带。"/>
+</StackPanel></Expander>
+<Button Name="SelectTarget" Content="选择目标窗口（3 秒内切换到游戏）" Click="Target_Click" Padding="10" Margin="0,12,0,6"/>
+<TextBlock Name="TargetLabel" Text="尚未选择目标窗口" TextWrapping="Wrap"/>
+<UniformGrid Columns="3" Margin="0,18,0,6"><Button Name="Play" Content="开始 / 继续（3 秒）" Click="Play_Click" Padding="8"/><Button Name="Pause" Content="暂停" Click="Pause_Click" IsEnabled="False"/><Button Name="Stop" Content="停止 / 回到开头" Click="Stop_Click"/></UniformGrid>
+<ProgressBar Name="Progress" Height="8" Margin="0,12"/>
+<TextBlock Name="State" Text="待机 · 尚未在游戏中验证" TextWrapping="Wrap"/>
+</StackPanel></ScrollViewer></Window>

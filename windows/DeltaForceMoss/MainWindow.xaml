@@ -31,6 +31,7 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="♫" Click="Performance_Click" ToolTip="口琴自动演奏" Width="24" Height="20" Margin="2,0"/>
                     <Button Name="PinBtn" Content="📌" Click="PinBtn_Click" ToolTip="固定置顶" Width="24" Height="20" Background="Transparent" Foreground="#00F0FF" BorderThickness="0" Cursor="Hand" Margin="2,0"/>
                     <Button Name="MinBtn" Content="—" Click="MinBtn_Click" ToolTip="最小化" Width="24" Height="20" Background="Transparent" Foreground="#8A9BAE" BorderThickness="0" Cursor="Hand" Margin="2,0"/>
                     <Button Name="CloseBtn" Content="✕" Click="CloseBtn_Click" ToolTip="关闭" Width="24" Height="20" Background="Transparent" Foreground="#FF0055" BorderThickness="0" Cursor="Hand" Margin="2,0"/>

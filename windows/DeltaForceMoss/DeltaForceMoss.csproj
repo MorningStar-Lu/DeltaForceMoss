@@ -7,10 +7,31 @@
     <UseWPF>true</UseWPF>
     <Title>DeltaForceMoss 摩斯密码破译浮窗</Title>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Platforms>AnyCPU;x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <!-- 单文件发布时把 skm.dll 一起抽出到运行目录，NativeLibrary.Load 才能按 BaseDirectory\x64\skm.dll 找到 -->
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="NAudio" Version="2.2.1" />
+  </ItemGroup>
+
+  <!--
+    SKSimulator 外接键鼠模拟器的运行库。
+    skm.dll 为第三方硬件 SDK，不随本仓库分发：构建前需自行把官方 SDK 的
+    x64\skm.dll（可选 x86\skm.dll）放到本 csproj 同级目录。
+    缺失时构建仍然成功，只是 SKSimulator 后端在运行时会明确提示缺少运行库。
+  -->
+  <ItemGroup>
+    <None Include="x64\skm.dll" Condition="Exists('x64\skm.dll')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>x64\skm.dll</Link>
+    </None>
+    <None Include="x86\skm.dll" Condition="Exists('x86\skm.dll')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>x86\skm.dll</Link>
+    </None>
   </ItemGroup>
 
 </Project>

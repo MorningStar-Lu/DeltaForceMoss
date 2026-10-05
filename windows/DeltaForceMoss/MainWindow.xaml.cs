@@ -23,18 +23,20 @@ namespace DeltaForceMoss
             // 订阅引擎事件
             _decoderEngine.OnDigitsUpdated += digits =>
             {
-                Dispatcher.Invoke(() => DigitsText.Text = digits);
+                Dispatcher.InvokeAsync(() => DigitsText.Text = digits);
             };
 
             _decoderEngine.OnCandidatesUpdated += candidates =>
             {
-                Dispatcher.Invoke(() => CandidateText.Text = candidates);
+                Dispatcher.InvokeAsync(() => CandidateText.Text = candidates);
             };
 
             _wasapiService.OnStatusChanged += status =>
             {
-                Dispatcher.Invoke(() => StatusText.Text = status);
+                Dispatcher.InvokeAsync(() => StatusText.Text = status);
             };
+
+            _decoderEngine.OnStatusUpdated += status => Dispatcher.InvokeAsync(() => StatusText.Text = status);
 
             // 订阅 WASAPI 音频帧，同时广播给 WebSocket 前端网页
             _wasapiService.OnAudioData += (samples, count) =>
@@ -69,6 +71,13 @@ namespace DeltaForceMoss
             {
                 DragMove();
             }
+        }
+
+        private Performance.PerformanceWindow? _performanceWindow;
+        private void Performance_Click(object sender, RoutedEventArgs e)
+        {
+            if (_performanceWindow == null) { _performanceWindow = new Performance.PerformanceWindow { Owner = this }; _performanceWindow.Closed += (_, _) => _performanceWindow = null; _performanceWindow.Show(); }
+            else _performanceWindow.Activate();
         }
 
         private void PinBtn_Click(object sender, RoutedEventArgs e)

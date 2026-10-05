@@ -12,3 +12,12 @@
 **/dist/
 **/.gradle/
 **/node_modules/
+
+# 本地转谱服务环境与密钥
+/.venv-transcribe/
+/local-service/.env
+**/__pycache__/
+
+# SKSimulator 第三方硬件 SDK 运行库（不随仓库分发，构建前自备）
+**/x64/skm.dll
+**/x86/skm.dll

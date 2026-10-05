@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Single-File EXE
+    name: Build EXE (两个版本)
     runs-on: windows-latest
 
     steps:
@@ -26,28 +26,139 @@ jobs:
         working-directory: windows/DeltaForceMoss
         run: dotnet restore -r win-x64
 
-      - name: Publish Single-File EXE
-        working-directory: windows/DeltaForceMoss
-        run: dotnet publish DeltaForceMoss.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ${{ github.workspace }}/build_out
+      # 版本号：把构建日期与短 SHA 写进程序集，便于和 Release 对账
+      - name: Compute build version
+        id: ver
+        shell: pwsh
+        run: |
+          $d = (Get-Date).ToString('yyyyMMdd')
+          $sha = '${{ github.sha }}'.Substring(0,7)
+          # 展示用版本（文件名 / Release tag / InformationalVersion）
+          $label = "$d-$sha"
+          # MSBuild 的 Version/AssemblyVersion 只接受纯数字 major.minor.build.revision，
+          # 带日期与短 SHA 的字符串会直接报错，所以另算一个合法值。
+          $major = [int]$d.Substring(0,4)
+          $minor = [int]$d.Substring(4,2)
+          $build = [int]$d.Substring(6,2)
+          $revision = [Convert]::ToInt32($sha.Substring(0,4), 16)
+          $numeric = "$major.$minor.$build.$revision"
+          "label=$label"     >> $env:GITHUB_OUTPUT
+          "tag=v$label"      >> $env:GITHUB_OUTPUT
+          "numeric=$numeric" >> $env:GITHUB_OUTPUT
+          "Publish tag: v$label  (assembly $numeric)"
 
-      - name: Upload Build Artifact
+      # ---------- 1) 自包含单文件版（免装 .NET 运行时） ----------
+      - name: Publish Self-Contained Single-File EXE
+        working-directory: windows/DeltaForceMoss
+        run: >
+          dotnet publish DeltaForceMoss.csproj -c Release -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:Version=${{ steps.ver.outputs.numeric }}
+          -p:InformationalVersion=${{ steps.ver.outputs.label }}
+          -o ${{ github.workspace }}/build_selfcontained
+
+      # ---------- 2) 框架依赖小体积版（需装 .NET 8 桌面运行时） ----------
+      - name: Publish Framework-Dependent EXE
+        working-directory: windows/DeltaForceMoss
+        run: >
+          dotnet publish DeltaForceMoss.csproj -c Release -r win-x64
+          --self-contained false
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:Version=${{ steps.ver.outputs.numeric }}
+          -p:InformationalVersion=${{ steps.ver.outputs.label }}
+          -o ${{ github.workspace }}/build_framework
+
+      # ---------- 打包：把 skm.dll 放到 exe 同级的 x64\ 目录 ----------
+      # 仓库不携带 skm.dll（第三方硬件 SDK）；若构建前已自行放入 csproj 同级 x64\，这里会自动带上。
+      - name: Assemble release bundles
+        shell: pwsh
+        run: |
+          $root = '${{ github.workspace }}'
+          foreach ($variant in @('selfcontained','framework')) {
+            $src  = Join-Path $root "build_$variant"
+            $exe  = Join-Path $src 'DeltaForceMoss.exe'
+            if (-not (Test-Path $exe)) { throw "缺少产物: $exe" }
+            $pkg  = Join-Path $root "pkg_$variant"
+            New-Item -ItemType Directory -Force -Path $pkg | Out-Null
+            Copy-Item $exe (Join-Path $pkg 'DeltaForceMoss.exe')
+            # pdb/xml 不发给用户
+            $skm = Join-Path $src 'x64\skm.dll'
+            if (Test-Path $skm) {
+              New-Item -ItemType Directory -Force -Path (Join-Path $pkg 'x64') | Out-Null
+              Copy-Item $skm (Join-Path $pkg 'x64\skm.dll')
+              Write-Host "已带 skm.dll -> pkg_$variant\x64\"
+            } else {
+              New-Item -ItemType Directory -Force -Path (Join-Path $pkg 'x64') | Out-Null
+              Set-Content -Path (Join-Path $pkg 'x64\放置skm.dll到本目录.txt') -Encoding UTF8 -Value @"
+          SKSimulator 外接键鼠模拟器需要官方 SDK 的运行库。
+
+          请到 https://github.com/scottfly189/SKSimulator 的 src\x64\ 目录取 skm.dll，
+          放到本目录（与 DeltaForceMoss.exe 同级的 x64\ 子目录）后重启程序。
+
+          只用 SendInput 方式（Windows 软件模拟键鼠）的话不需要这个文件。
+          "@
+            }
+            Compress-Archive -Path (Join-Path $pkg '*') -DestinationPath (Join-Path $root "DeltaForceMoss-$variant-${{ steps.ver.outputs.label }}.zip") -Force
+            Write-Host "打包完成: DeltaForceMoss-$variant-${{ steps.ver.outputs.label }}.zip"
+          }
+
+      - name: Show artifact sizes
+        shell: pwsh
+        run: |
+          Get-ChildItem '${{ github.workspace }}' -Filter 'DeltaForceMoss-*.zip' |
+            Select-Object Name, @{n='MB';e={[math]::Round($_.Length/1MB,1)}} | Format-Table -AutoSize
+
+      - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: DeltaForceMoss-Windows-x64
-          path: ${{ github.workspace }}/build_out/DeltaForceMoss.exe
+          path: |
+            ${{ github.workspace }}/build_selfcontained/DeltaForceMoss.exe
+            ${{ github.workspace }}/build_framework/DeltaForceMoss.exe
+            ${{ github.workspace }}/DeltaForceMoss-*.zip
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.0
-          name: DeltaForceMoss v1.0.0 (Windows 独立客户端)
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: DeltaForceMoss ${{ steps.ver.outputs.label }} (Windows 独立客户端)
           body: |
             ## DeltaForceMoss 摩斯破译器 Windows 独立客户端
 
-            功能特性：
+            本版本提供两种打包（功能完全相同，按需选一个）：
+
+            | 包 | 说明 | 体积 |
+            | --- | --- | --- |
+            | `DeltaForceMoss-selfcontained-*.zip` | **自带 .NET 运行时**，解压双击即用，无需安装任何东西 | 约 150 MB |
+            | `DeltaForceMoss-framework-*.zip` | **体积小**，需先装 [.NET 8 桌面运行时](https://dotnet.microsoft.com/download/dotnet/8.0) | 约 2 MB |
+
+            ### 关于口琴自动演奏（键鼠输出）
+
+            演奏窗口提供两种输入方式，共用同一套曲谱与播放计时，停止或切换时都会释放按键：
+
+            - **SendInput**：Windows 软件模拟键鼠输入，无需额外硬件，解压即可用。
+            - **SKSimulator**：通过外接键鼠模拟器硬件发送输入，需自备该设备及其校验数据。
+
+            SKSimulator 的运行库 `skm.dll` 属于第三方硬件 SDK，不随本包分发。
+            若要使用该方式，请到 [scottfly189/SKSimulator](https://github.com/scottfly189/SKSimulator)
+            的 `src\x64\` 取 `skm.dll`，放到 `DeltaForceMoss.exe` 同级目录的 `x64\` 里（包内已留该目录与说明文件）。
+
+            ### 其他功能
+
             - WASAPI 全局系统声音免弹窗监听
-            - 突破无边框窗口化游戏最高置顶悬浮窗
+            - 无边框窗口化游戏下的最高置顶悬浮窗
             - 本地 WebSocket 广播桥接服务
-          files: ${{ github.workspace }}/build_out/DeltaForceMoss.exe
+
+            ### 未验证项（如实说明）
+
+            - SKSimulator 后端：P/Invoke 签名、设备搜索/打开/校验顺序、键名表已逐条对照官方 SDK 核对，
+              **但没有该硬件，未做真机验证**。
+            - WASAPI 实机听音、独占全屏置顶行为需要在真实环境确认。
+          files: |
+            ${{ github.workspace }}/DeltaForceMoss-selfcontained-${{ steps.ver.outputs.label }}.zip
+            ${{ github.workspace }}/DeltaForceMoss-framework-${{ steps.ver.outputs.label }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
