@@ -22,6 +22,9 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Verify native dot/dash timing
+        run: dotnet run --project windows/DecoderRegression/DecoderRegression.csproj -c Release
+
       - name: Restore dependencies
         working-directory: windows/DeltaForceMoss
         run: dotnet restore -r win-x64

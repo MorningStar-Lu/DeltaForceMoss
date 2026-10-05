@@ -50,6 +50,7 @@ namespace DeltaForceMoss
                 try
                 {
                     _wasapiService.Start();
+                    _wsServer.SampleRate = _wasapiService.SampleRate;
                     _wsServer.Start(9999);
                 }
                 catch (Exception ex)
@@ -62,6 +63,7 @@ namespace DeltaForceMoss
             {
                 _wsServer.Dispose();
                 _wasapiService.Dispose();
+                _decoderEngine.Dispose();
             };
         }
 

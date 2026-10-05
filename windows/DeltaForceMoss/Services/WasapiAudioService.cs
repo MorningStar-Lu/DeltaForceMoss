@@ -21,15 +21,19 @@ namespace DeltaForceMoss.Services
             try
             {
                 _capture = new WasapiLoopbackCapture();
+                var capture = _capture;
                 _capture.DataAvailable += (s, e) =>
                 {
                     if (e.BytesRecorded == 0) return;
 
-                    var waveFormat = _capture.WaveFormat;
+                    var waveFormat = capture.WaveFormat;
                     int samplesRecorded = e.BytesRecorded / (waveFormat.BitsPerSample / 8);
                     float[] floatBuffer = new float[samplesRecorded];
 
-                    if (waveFormat.Encoding == WaveFormatEncoding.IeeeFloat)
+                    bool isFloat = waveFormat.Encoding == WaveFormatEncoding.IeeeFloat
+                        || waveFormat is WaveFormatExtensible extensible
+                        && extensible.SubFormat == new Guid("00000003-0000-0010-8000-00aa00389b71");
+                    if (isFloat && waveFormat.BitsPerSample == 32)
                     {
                         for (int i = 0; i < samplesRecorded; i++)
                         {
@@ -43,6 +47,26 @@ namespace DeltaForceMoss.Services
                             short sample = BitConverter.ToInt16(e.Buffer, i * 2);
                             floatBuffer[i] = sample / 32768f;
                         }
+                    }
+
+                    else if (waveFormat.BitsPerSample == 24)
+                    {
+                        for (int i = 0; i < samplesRecorded; i++)
+                        {
+                            int offset = i * 3;
+                            int value = e.Buffer[offset] | e.Buffer[offset + 1] << 8 | e.Buffer[offset + 2] << 16;
+                            floatBuffer[i] = (value << 8 >> 8) / 8388608f;
+                        }
+                    }
+                    else if (waveFormat.BitsPerSample == 32)
+                    {
+                        for (int i = 0; i < samplesRecorded; i++)
+                            floatBuffer[i] = BitConverter.ToInt32(e.Buffer, i * 4) / 2147483648f;
+                    }
+                    else
+                    {
+                        OnStatusChanged?.Invoke($"不支持的音频格式: {waveFormat}");
+                        return;
                     }
 
                     // 如果是双声道/多声道，转换为单声道

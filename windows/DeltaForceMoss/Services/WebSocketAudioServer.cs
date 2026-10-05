@@ -4,6 +4,8 @@ using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text;
+using System.Threading.Channels;
 
 namespace DeltaForceMoss.Services
 {
@@ -13,7 +15,14 @@ namespace DeltaForceMoss.Services
     public class WebSocketAudioServer : IDisposable
     {
         private HttpListener? _httpListener;
-        private readonly List<WebSocket> _clients = new();
+        private sealed class Client
+        {
+            public WebSocket Socket { get; }
+            public Channel<byte[]> Audio { get; } = Channel.CreateBounded<byte[]>(32);
+            public Client(WebSocket socket) => Socket = socket;
+        }
+        private readonly List<Client> _clients = new();
+        public int SampleRate { get; set; } = 48000;
         private readonly object _lock = new();
         private bool _isRunning;
 
@@ -66,15 +75,19 @@ namespace DeltaForceMoss.Services
 
         private async void ProcessWebSocketRequest(HttpListenerContext context)
         {
+            Client? client = null;
+            WebSocket? ws = null;
+            Task? sending = null;
             try
             {
                 var wsContext = await context.AcceptWebSocketAsync(null);
-                var ws = wsContext.WebSocket;
+                ws = wsContext.WebSocket;
 
-                lock (_lock)
-                {
-                    _clients.Add(ws);
-                }
+                var metadata = Encoding.UTF8.GetBytes($"{{\"type\":\"audio-format\",\"encoding\":\"float32\",\"channels\":1,\"sampleRate\":{SampleRate}}}");
+                await ws.SendAsync(new ArraySegment<byte>(metadata), WebSocketMessageType.Text, true, CancellationToken.None);
+                client = new Client(ws);
+                lock (_lock) _clients.Add(client);
+                sending = SendAudio(client);
                 OnLog?.Invoke("网页前端已成功接入免弹窗音频流");
 
                 byte[] buffer = new byte[1024];
@@ -87,13 +100,19 @@ namespace DeltaForceMoss.Services
                     }
                 }
 
-                lock (_lock)
-                {
-                    _clients.Remove(ws);
-                }
-                ws.Dispose();
             }
             catch { }
+            finally
+            {
+                if (client != null)
+                {
+                    client.Audio.Writer.TryComplete();
+                    client.Socket.Abort();
+                    if (sending != null) await sending;
+                    lock (_lock) _clients.Remove(client);
+                }
+                ws?.Dispose();
+            }
         }
 
         public void BroadcastAudio(float[] samples, int count)
@@ -102,25 +121,30 @@ namespace DeltaForceMoss.Services
 
             byte[] byteBuffer = new byte[count * 4];
             Buffer.BlockCopy(samples, 0, byteBuffer, 0, byteBuffer.Length);
-            var segment = new ArraySegment<byte>(byteBuffer);
-
-            List<WebSocket> currentClients;
             lock (_lock)
             {
-                currentClients = new List<WebSocket>(_clients);
-            }
-
-            foreach (var client in currentClients)
-            {
-                if (client.State == WebSocketState.Open)
+                foreach (var client in _clients)
                 {
-                    try
+                    if (!client.Audio.Writer.TryWrite(byteBuffer))
                     {
-                        client.SendAsync(segment, WebSocketMessageType.Binary, true, CancellationToken.None);
+                        // A slow client must reconnect instead of losing pulse timing.
+                        client.Audio.Writer.TryComplete();
+                        client.Socket.Abort();
                     }
-                    catch { }
                 }
             }
+        }
+
+        private static async Task SendAudio(Client client)
+        {
+            try
+            {
+                await foreach (var packet in client.Audio.Reader.ReadAllAsync())
+                {
+                    await client.Socket.SendAsync(new ArraySegment<byte>(packet), WebSocketMessageType.Binary, true, CancellationToken.None);
+                }
+            }
+            catch { client.Socket.Abort(); }
         }
 
         public void Stop()
@@ -130,7 +154,8 @@ namespace DeltaForceMoss.Services
             {
                 foreach (var client in _clients)
                 {
-                    try { client.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed", CancellationToken.None); } catch { }
+                    client.Audio.Writer.TryComplete();
+                    client.Socket.Abort();
                 }
                 _clients.Clear();
             }
