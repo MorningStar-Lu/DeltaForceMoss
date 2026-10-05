@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../DeltaForceMoss/Performance/Score.cs" Link="Score.cs" />
+  </ItemGroup>
+  <!-- 与主工程同一份内置曲谱，保证校验的就是随包发行的那个文件 -->
+  <ItemGroup>
+    <EmbeddedResource Include="../DeltaForceMoss/Scores/*.json" LogicalName="builtin.%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

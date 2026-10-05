@@ -29,7 +29,10 @@ python3 -m http.server 4173
 - Windows 口琴自动演奏：`PerformanceWindow` 导入鼠鼠 JSON 曲谱，两种输入后端共用同一套曲谱解析与播放计时，停止、暂停、切换后端或异常退出时统一释放按键。
   - `SendInputBackend`：Windows `SendInput` 软件模拟键鼠，无需额外硬件。
   - `SKSimulatorBackend`：按 [scottfly189/SKSimulator](https://github.com/scottfly189/SKSimulator) 官方 C# SDK 封装 `skm.dll`，走外接键鼠模拟器硬件。签名、初始化顺序与键名表已对照官方源码核对；`skm.dll` 需自备并放到 exe 同级 `x64\`，**无真机验证**。
-  - F8 为紧急停止热键；演奏仅在已选目标窗口处于前台时输出输入。
+  - 演奏窗口默认置顶并带 📌 钉住开关（与摩斯小窗一致），游戏中切换窗口后仍可见进度与当前音符；
+    F8 为紧急停止热键；演奏仅在已选目标窗口处于前台时输出输入。
+  - 内置示例曲谱 `Scores/miracle.json`（《奇迹再现》）编译进程序集，「载入内置曲谱」一键试弹，无需外部文件；
+    外部曲谱仍可用「选择曲谱 JSON」导入。曲谱随包校验见 CI 的 ScoreRegression。
 
 - 实验性 Windows WPF 客户端：WASAPI 默认播放设备捕获、摩斯结果小窗和本机 WebSocket 音频桥接。源码已存在，仍需 Windows 构建与实机验证。
 

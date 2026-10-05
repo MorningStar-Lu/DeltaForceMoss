@@ -25,6 +25,9 @@ jobs:
       - name: Verify native dot/dash timing
         run: dotnet run --project windows/DecoderRegression/DecoderRegression.csproj -c Release
 
+      - name: Verify builtin score parses and maps
+        run: dotnet run --project windows/ScoreRegression/ScoreRegression.csproj -c Release
+
       - name: Restore dependencies
         working-directory: windows/DeltaForceMoss
         run: dotnet restore -r win-x64

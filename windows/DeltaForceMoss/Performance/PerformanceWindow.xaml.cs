@@ -24,7 +24,31 @@ public partial class PerformanceWindow : Window
     private async Task CloseAfterStop(){if(playing!=null)await playing;Close();}
     private void Cleanup(){cancellation?.Dispose();if(source!=null){if(hotkey)UnregisterHotKey(source.Handle,81);source.RemoveHook(Hook);}}
     private IntPtr Hook(IntPtr hwnd,int msg,IntPtr w,IntPtr l,ref bool handled){if(msg==0x312&&w.ToInt32()==81){Stop_Click(this,new RoutedEventArgs());handled=true;}return IntPtr.Zero;}
-    private void Import_Click(object sender,RoutedEventArgs e){if(playing is {IsCompleted:false})return;var dialog=new OpenFileDialog{Filter="鼠鼠曲谱 JSON|*.json"};if(dialog.ShowDialog()!=true)return;try{var parsed=MusicScore.Parse(File.ReadAllText(dialog.FileName,Encoding.UTF8));score=parsed;player.Reset();Progress.Value=0;Song.Text=$"{parsed.Name} · {parsed.Bpm} BPM · {parsed.Meter} · {parsed.Notes.Count} 音 · {parsed.TotalBeats:0.######} 拍";State.Text="已载入；选择目标窗口后开始";}catch(Exception ex){State.Text="导入失败："+ex.Message;}}
+    private void PinBtn_Click(object sender,RoutedEventArgs e)
+    {
+        Topmost=!Topmost;
+        PinBtn.Foreground=Topmost?System.Windows.Media.Brushes.Cyan:System.Windows.Media.Brushes.Gray;
+    }
+    private void Load(string text)
+    {
+        var parsed=MusicScore.Parse(text);score=parsed;player.Reset();Progress.Value=0;
+        Song.Text=$"{parsed.Name} · {parsed.Bpm} BPM · {parsed.Meter} · {parsed.Notes.Count} 音 · {parsed.TotalBeats:0.######} 拍";
+        TargetLabel.Text=TargetLabel.Text.StartsWith("目标：",StringComparison.Ordinal)?TargetLabel.Text:"尚未选择目标窗口";
+        State.Text="已载入；选择目标窗口后开始";
+    }
+    private void Import_Click(object sender,RoutedEventArgs e){if(playing is {IsCompleted:false})return;var dialog=new OpenFileDialog{Filter="鼠鼠曲谱 JSON|*.json"};if(dialog.ShowDialog()!=true)return;try{Load(File.ReadAllText(dialog.FileName,Encoding.UTF8));}catch(Exception ex){State.Text="导入失败："+ex.Message;}}
+    // 内置曲谱：编译进程序集，随包分发，无需外部文件。
+    private void Builtin_Click(object sender,RoutedEventArgs e){
+        if(playing is {IsCompleted:false})return;
+        try{
+            var assembly=typeof(PerformanceWindow).Assembly;
+            var name=Array.Find(assembly.GetManifestResourceNames(),n=>n.EndsWith("Scores.miracle.json",StringComparison.Ordinal));
+            if(name==null)throw new InvalidOperationException("本构建未包含内置曲谱");
+            using var stream=assembly.GetManifestResourceStream(name)!;
+            using var reader=new StreamReader(stream,Encoding.UTF8);
+            Load(reader.ReadToEnd());
+        }catch(Exception ex){State.Text="载入内置曲谱失败："+ex.Message;}
+    }
     private bool TargetActive(){var window=GetForegroundWindow();GetWindowThreadProcessId(window,out var process);return window==target&&process==targetProcess&&target!=IntPtr.Zero;}
     private async Task Countdown(string text,CancellationToken token){for(int i=3;i>0;i--){State.Text=$"{text} · {i} 秒";await Task.Delay(1000,token);}}
     private async void Target_Click(object sender,RoutedEventArgs e){if(playing is {IsCompleted:false})return;SelectTarget.IsEnabled=false;Play.IsEnabled=false;try{await Countdown("请切换到目标游戏窗口",CancellationToken.None);var window=GetForegroundWindow();GetWindowThreadProcessId(window,out var process);if(window==IntPtr.Zero||process==Environment.ProcessId)throw new InvalidOperationException("未选到外部窗口");target=window;targetProcess=process;var title=new StringBuilder(256);GetWindowText(window,title,256);TargetLabel.Text=$"目标：{title} · PID {process}";State.Text="目标已选择；开始前会再倒数 3 秒";}catch(Exception ex){State.Text=ex.Message;}finally{SelectTarget.IsEnabled=true;Play.IsEnabled=true;}}

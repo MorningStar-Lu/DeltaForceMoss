@@ -49,6 +49,15 @@ dotnet publish -c Release -r win-x64 --self-contained false /p:PublishSingleFile
 推送到 `main` / `codex` 分支会触发 GitHub Actions（`.github/workflows/build-exe.yml`），
 同时产出上面两个版本并附到以日期+短 SHA 命名的 Release。
 
+## 口琴自动演奏窗口
+
+从主浮窗的 ♫ 按钮打开。载入曲谱 → 选择目标窗口 → 开始，即按鼠鼠 JSON 曲谱自动按键。
+
+- **置顶**：窗口默认始终置顶，带 📌 钉住开关，切换回游戏后仍能看到进度与当前音符。
+- **载入曲谱**：「选择曲谱 JSON」导入外部鼠鼠 JSON；「载入内置曲谱」直接载入随包发行的《奇迹再现》。
+- **两种输入方式**：SendInput（软件模拟，无需硬件）与 SKSimulator（外接键鼠模拟器，需自备 skm.dll）。
+- **F8** 为全局紧急停止热键，随时释放所有按键。
+
 ## 极简浮窗功能说明
 
 - **📌 钉住/置顶**：默认开启系统全局置顶，即使切换至游戏窗口也能始终保留在屏幕最上方。

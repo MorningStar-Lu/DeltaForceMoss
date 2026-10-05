@@ -17,6 +17,11 @@
     <PackageReference Include="NAudio" Version="2.2.1" />
   </ItemGroup>
 
+  <!-- 内置示例曲谱：编译进程序集，无需外部文件即可试弹 -->
+  <ItemGroup>
+    <EmbeddedResource Include="Scores\*.json" />
+  </ItemGroup>
+
   <!--
     SKSimulator 外接键鼠模拟器的运行库。
     skm.dll 为第三方硬件 SDK，不随本仓库分发：构建前需自行把官方 SDK 的
